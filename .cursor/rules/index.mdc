@@ -1,0 +1,123 @@
+---
+description: Basic rules for Data Tracking Plan Flask application
+globs: ["**/*.py", "**/*.html", "**/*.js", "**/*.css", "**/*.json", "**/*.csv"]
+alwaysApply: true
+---
+
+# Data Tracking Plan - Project Rules
+
+## 🏗️ Code Organization
+
+### Parser Structure
+- Each parser class must handle a specific data source (Amplitude, Insider, GTM)
+- All parsers must implement consistent method signatures for platform overview, events summary, and data retrieval
+- Parser initialization must include proper error handling and data validation
+- Use type hints for all parser methods and return types
+
+### Flask Application Structure
+- Keep route handlers concise - delegate complex logic to parser classes
+- All routes must include error handling for missing or invalid data
+- API endpoints should return JSON with consistent error response format
+- Use descriptive route names that match their functionality
+
+### Data Processing
+- Always validate data existence before processing
+- Use pandas for CSV data manipulation when dealing with large datasets
+- Implement data caching where appropriate to improve performance
+- Return dictionaries with consistent key naming across all parsers
+
+## 🔧 Configuration Management
+
+### File Paths
+- Use pathlib.Path for all file path operations
+- Store all data source paths in config.py
+- Validate file existence during parser initialization
+- Support both relative and absolute paths
+
+### Environment Settings
+- Keep sensitive configuration in environment variables
+- Provide development defaults in config.py
+- Use clear naming conventions for configuration variables
+
+## 🛡️ Error Handling
+
+### Parser Error Management
+- Wrap file loading operations in try-catch blocks
+- Provide descriptive error messages that include context
+- Continue application startup even if some parsers fail to initialize
+- Log parser initialization status at startup
+
+### Route Error Handling
+- Return user-friendly error pages for missing data
+- Implement 404 and 500 error handlers
+- Validate parser availability before accessing data
+- Use consistent error response format for API endpoints
+
+## 📊 Data Standards
+
+### CSV Processing
+- Validate required columns exist before processing
+- Handle missing or null values gracefully
+- Use pandas for efficient data manipulation
+- Implement data type validation where needed
+
+### JSON Processing
+- Validate JSON structure before parsing
+- Handle nested objects and arrays consistently
+- Implement schema validation for complex JSON structures
+- Provide fallback values for missing keys
+
+## 🎨 Frontend Standards
+
+### Template Organization
+- Use base template for consistent layout
+- Keep template logic minimal - process data in Python
+- Use descriptive variable names in template context
+- Implement consistent styling across all pages
+
+### API Design
+- Prefix all API routes with `/api/`
+- Include platform name in API endpoint paths
+- Return consistent JSON structure with data and metadata
+- Implement proper HTTP status codes
+
+## 📝 Documentation
+
+### Code Comments
+- Every function must include docstring with purpose, args, and returns
+- Use type hints for all function parameters and return values
+- Include inline comments for complex business logic
+- Document any data source requirements or assumptions
+
+### File Headers
+- Include brief description at the top of each parser file
+- Document expected data format and column requirements
+- Specify any dependencies or external requirements
+
+## 🔄 Data Flow
+
+### Parser Patterns
+- Initialize parsers once at application startup
+- Cache processed data to avoid repeated computation
+- Use consistent method naming across all parsers
+- Return structured data that templates can easily consume
+
+### Platform Integration
+- Each platform parser should be independent and testable
+- Implement consistent error handling across all platforms
+- Provide platform overview method for dashboard summary
+- Support partial data loading when some sources are unavailable
+
+## 🧪 Testing Patterns
+
+### Parser Testing
+- Support standalone parser testing without Flask application
+- Provide sample data or mock data for testing
+- Test error conditions and edge cases
+- Validate data transformations and calculations
+
+### Development Workflow
+- Use debug mode for development
+- Implement hot reloading for development efficiency
+- Provide clear startup messages with platform status
+- Include helpful error messages during development

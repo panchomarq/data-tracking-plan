@@ -72,19 +72,19 @@
                         <div class="col-6">
                             <div class="metric">
                                 <div class="metric-value">{{ platform.unique_properties }}</div>
-                                <div class="metric-label">Parameters</div>
+                                <div class="metric-label">Total Parameters</div>
                             </div>
                         </div>
                         <div class="col-6 mt-2">
                             <div class="metric">
-                                <div class="metric-value text-warning">{{ platform.pii_events }}</div>
-                                <div class="metric-label">PII Events</div>
+                                <div class="metric-value text-secondary">{{ platform.custom_params }}</div>
+                                <div class="metric-label">Custom (c_*)</div>
                             </div>
                         </div>
                         <div class="col-6 mt-2">
                             <div class="metric">
-                                <div class="metric-value text-info">{{ platform.segmentation_events }}</div>
-                                <div class="metric-label">Segmentation</div>
+                                <div class="metric-value text-success">{{ platform.native_params }}</div>
+                                <div class="metric-label">Native</div>
                             </div>
                         </div>
                     {% elif 'GTM' in platform.platform %}

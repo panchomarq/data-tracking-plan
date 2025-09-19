@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Set
+from typing import Dict, List
 from collections import Counter, defaultdict
 
 class InsiderParser:
@@ -72,6 +72,32 @@ class InsiderParser:
             'categories': dict(categories)
         }
     
+    def count_unique_parameters(self) -> int:
+        """
+        Cuenta cuántas claves de parámetro únicas hay en todos los eventos.
+        
+        Returns:
+            int: Number of unique parameter keys
+        """
+        if not self.data:
+            return 0
+        
+        # Extrae todas las instancias de parámetro
+        all_params = [
+            param
+            for event in self.data
+            for param in event.get("params", [])
+        ]
+        
+        # Construye un set de keys no vacías
+        unique_keys = {
+            param.get("key")
+            for param in all_params
+            if param.get("key")
+        }
+        
+        return len(unique_keys)
+
     def get_properties_summary(self) -> Dict:
         """
         Get comprehensive summary of event parameters in Insider.
@@ -87,31 +113,66 @@ class InsiderParser:
             all_params.extend(event.get('params', []))
         
         total_properties = len(all_params)
+        unique_properties = self.count_unique_parameters()
         
-        # Unique parameter names
-        unique_params = set(param.get('key', '') for param in all_params)
-        unique_properties = len(unique_params)
-        
-        # Parameter types breakdown
-        param_types = Counter(param.get('type', 'unknown') for param in all_params)
-        
-        # PII parameters
-        pii_params = sum(1 for param in all_params if param.get('is_pii', False))
-        
-        # Segmentation parameters
-        segmentation_params = sum(1 for param in all_params if param.get('show_on_segment', False))
-        
-        # Parameters with display names
-        named_params = sum(1 for param in all_params if param.get('display_name'))
+        # Get unique parameter analysis for more accurate counts
+        unique_param_analysis = self._get_unique_parameter_analysis()
         
         return {
             'total_properties': total_properties,
             'unique_properties': unique_properties,
-            'param_types': dict(param_types),
-            'pii_params': pii_params,
-            'segmentation_params': segmentation_params,
-            'named_params': named_params,
-            'unnamed_params': total_properties - named_params
+            'param_types': unique_param_analysis['types'],
+            'pii_params': unique_param_analysis['pii_count'],
+            'segmentation_params': unique_param_analysis['segmentation_count'],
+            'named_params': unique_param_analysis['named_count'],
+            'unnamed_params': unique_properties - unique_param_analysis['named_count'],
+            'custom_params': unique_param_analysis['custom_count'],
+            'native_params': unique_param_analysis['native_count']
+        }
+    
+    def _get_unique_parameter_analysis(self) -> Dict:
+        """
+        Analyze unique parameters for accurate counts.
+        
+        Returns:
+            Dict: Analysis of unique parameters including custom vs native distinction
+        """
+        if not self.data:
+            return {
+                'types': {}, 'pii_count': 0, 'segmentation_count': 0, 'named_count': 0,
+                'custom_count': 0, 'native_count': 0
+            }
+        
+        # Collect unique parameters with their characteristics
+        unique_params = {}
+        
+        for event in self.data:
+            for param in event.get('params', []):
+                param_key = param.get('key', '')
+                if param_key and param_key not in unique_params:
+                    unique_params[param_key] = {
+                        'type': param.get('type', 'unknown'),
+                        'is_pii': param.get('is_pii', False),
+                        'show_on_segment': param.get('show_on_segment', False),
+                        'display_name': param.get('display_name', ''),
+                        'is_custom': param_key.startswith('c_')
+                    }
+        
+        # Count characteristics of unique parameters
+        types = Counter(param_data['type'] for param_data in unique_params.values())
+        pii_count = sum(1 for param_data in unique_params.values() if param_data['is_pii'])
+        segmentation_count = sum(1 for param_data in unique_params.values() if param_data['show_on_segment'])
+        named_count = sum(1 for param_data in unique_params.values() if param_data['display_name'])
+        custom_count = sum(1 for param_data in unique_params.values() if param_data['is_custom'])
+        native_count = len(unique_params) - custom_count
+        
+        return {
+            'types': dict(types),
+            'pii_count': pii_count,
+            'segmentation_count': segmentation_count,
+            'named_count': named_count,
+            'custom_count': custom_count,
+            'native_count': native_count
         }
     
     def get_events_list(self) -> List[Dict]:
@@ -261,7 +322,8 @@ class InsiderParser:
                 'is_type_consistent': is_type_consistent,
                 'is_pii_consistent': is_pii_consistent,
                 'is_segment_consistent': is_segment_consistent,
-                'all_instances': instances
+                'all_instances': instances,
+                'is_custom': param_key.startswith('c_')
             }
             
             unique_parameters.append(unique_param)
@@ -372,6 +434,8 @@ class InsiderParser:
             'total_events': events_summary['total_events'],
             'total_properties': properties_summary['total_properties'],
             'unique_properties': properties_summary['unique_properties'],
+            'custom_params': properties_summary['custom_params'],
+            'native_params': properties_summary['native_params'],
             'pii_events': events_summary['pii_events'],
             'segmentation_events': events_summary['segmentation_events'],
             'categories_count': len(events_summary['categories']),

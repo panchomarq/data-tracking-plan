@@ -380,10 +380,10 @@
 <!-- Data injection scripts -->
 <script type="text/javascript">
 /* eslint-disable */
-window.insiderTypesData = {{ data.properties_summary.param_types | tojson | safe }};
+window.insiderTypesData = {{ (data.properties_summary.param_types or {}) | tojson | safe }};
 window.insiderPiiData = {
-    'PII Parameters': {{ data.properties_summary.pii_params }},
-    'Non-PII Parameters': {{ data.properties_summary.total_properties - data.properties_summary.pii_params }}
+    'PII Parameters': {{ data.properties_summary.pii_params or 0 }},
+    'Non-PII Parameters': {{ (data.properties_summary.unique_properties or 0) - (data.properties_summary.pii_params or 0) }}
 };
 window.eventsData = {{ data.events_list | tojson | safe }};
 window.eventParamsData = {{ data.parameters_by_event | tojson | safe }};

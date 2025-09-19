@@ -1,7 +1,7 @@
 import csv
 import pandas as pd
-from typing import Dict, List, Set, Tuple
-from collections import Counter, defaultdict
+from typing import Dict, List
+from collections import defaultdict
 
 class AmplitudeParser:
     """

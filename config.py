@@ -16,7 +16,7 @@ class Config:
     
     # Amplitude configuration
     AMPLITUDE_DIR = SOURCES_DIR / 'amplitude'
-    AMPLITUDE_CSV = AMPLITUDE_DIR / 'Kavak - PROD_events_2025-07-17T12_55_21.764+00_00.csv'
+    AMPLITUDE_CSV = AMPLITUDE_DIR / 'amplitude_events.csv'
     
     # Insider configuration  
     INSIDER_DIR = SOURCES_DIR / 'insider'

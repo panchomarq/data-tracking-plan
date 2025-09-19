@@ -12,6 +12,9 @@ function initializeCharts() {
     
     // Create comparison charts
     createComparisonCharts();
+    
+    // Create Amplitude-specific charts
+    createAmplitudeCharts();
 }
 
 function createPlatformBreakdownCharts() {
@@ -256,6 +259,99 @@ function applyFilters() {
         
         row.style.display = shouldShow ? '' : 'none';
     });
+}
+
+function createAmplitudeCharts() {
+    // Amplitude Activity Status Chart
+    const activityElement = document.getElementById('amplitude-activity-chart');
+    if (activityElement && window.amplitudeActivityData) {
+        const data = [{
+            values: Object.values(window.amplitudeActivityData),
+            labels: Object.keys(window.amplitudeActivityData),
+            type: 'pie',
+            marker: {
+                colors: ['#28a745', '#dc3545', '#6c757d']
+            }
+        }];
+        
+        const layout = {
+            title: 'Event Activity Status',
+            height: 300,
+            margin: { t: 40, b: 40, l: 40, r: 40 }
+        };
+        
+        Plotly.newPlot(activityElement, data, layout, {responsive: true});
+    }
+    
+    // Amplitude Property Types Chart
+    const typesElement = document.getElementById('amplitude-types-chart');
+    if (typesElement && window.amplitudeTypesData) {
+        const data = [{
+            values: Object.values(window.amplitudeTypesData),
+            labels: Object.keys(window.amplitudeTypesData),
+            type: 'pie',
+            marker: {
+                colors: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14']
+            }
+        }];
+        
+        const layout = {
+            title: 'Property Value Types',
+            height: 300,
+            margin: { t: 40, b: 40, l: 40, r: 40 }
+        };
+        
+        Plotly.newPlot(typesElement, data, layout, {responsive: true});
+    }
+    
+    // Amplitude Schema Status Chart
+    const schemaElement = document.getElementById('amplitude-schema-chart');
+    if (schemaElement && window.amplitudeSchemaData) {
+        const data = [{
+            values: Object.values(window.amplitudeSchemaData),
+            labels: Object.keys(window.amplitudeSchemaData),
+            type: 'pie',
+            marker: {
+                colors: ['#28a745', '#ffc107', '#dc3545']
+            }
+        }];
+        
+        const layout = {
+            title: 'Schema Status Distribution',
+            height: 300,
+            margin: { t: 40, b: 40, l: 40, r: 40 }
+        };
+        
+        Plotly.newPlot(schemaElement, data, layout, {responsive: true});
+    }
+    
+    // Amplitude Categories Chart
+    const categoriesElement = document.getElementById('amplitude-categories-chart');
+    if (categoriesElement && window.amplitudeCategoriesData) {
+        const data = [{
+            x: Object.keys(window.amplitudeCategoriesData),
+            y: Object.values(window.amplitudeCategoriesData),
+            type: 'bar',
+            marker: {
+                color: '#007bff'
+            }
+        }];
+        
+        const layout = {
+            title: 'Events by Category',
+            height: 300,
+            margin: { t: 40, b: 80, l: 40, r: 40 },
+            xaxis: {
+                tickangle: -45,
+                title: 'Categories'
+            },
+            yaxis: {
+                title: 'Number of Events'
+            }
+        };
+        
+        Plotly.newPlot(categoriesElement, data, layout, {responsive: true});
+    }
 }
 
 // Utility functions

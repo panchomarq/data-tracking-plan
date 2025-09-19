@@ -55,7 +55,7 @@ def get_count_of_event_properties(file_path):
     return total_properties
 
 if __name__ == "__main__":
-    csv_file = 'Kavak - PROD_events_2025-07-17T12_55_21.764+00_00.csv'
+    csv_file = 'amplitude_events.csv'
     unique_names = get_unique_event_display_names(csv_file)
     event_count = get_count_of_events_by_display_name(csv_file)
     event_properties_count = get_count_of_event_properties(csv_file)

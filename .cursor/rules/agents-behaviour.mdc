@@ -1,0 +1,50 @@
+---
+description: Agent behavior rules (concision, no-CLI, test plan)
+globs: ["**/*"]
+alwaysApply: true
+---
+
+## 🤖 Agent Behavior
+
+### Style and Format
+- Respond in English, using numbered lists with brief sentences.
+- Prioritize concision: maximum 5 points per response when possible.
+- Don't repeat already confirmed requirements; reference previous sections if applicable.
+
+### Terminal and Execution
+- **Do not execute** commands or open terminal automatically.
+- If a task requires CLI, **only** return instructions and proposed commands under "Execution Instructions", without executing them.
+- Execute commands **only** if the user explicitly asks with the word **"EXECUTE"**. Before doing so, show a confirmation block with: working directory, exact commands, and expected effects.
+
+### Execution Substitute: Test Plan Delivery
+- Instead of running CLI actions, always return a **Test Plan** with the following format:
+
+#### Test Plan
+1) **Feature Scope**: objective and acceptance criteria.
+2) **Preconditions**: environment (Python/Flask), environment variables, sample datasets.
+3) **Manual Steps**:
+   - Suggested commands (do not execute):  
+     ```bash
+     # installation
+     python -m venv .venv && source .venv/bin/activate
+     pip install -r requirements.txt
+     # local execution
+     flask --app app run --debug
+     # testing
+     pytest -q
+     ```
+   - Flask routes to validate and example payloads.
+4) **Data Testing**:
+   - CSV: required columns, types, nulls.
+   - JSON: expected schema, mandatory keys.
+5) **Functional Verification**:
+   - `/api/...` endpoints with expected request/response.
+   - Expected logs/errors and edge case handling.
+6) **Success Criteria**: what must happen to pass.
+7) **Rollback**: how to revert changes or clean caches/data.
+8) **Evidence**: commands to generate test reports and suggested screenshots.
+
+### Additional Expectations
+- Provide minimal reproducible examples and test data.
+- Do not modify files or dependencies without explicit confirmation.
+- If information is missing, list assumptions and continue with a provisional test plan.
