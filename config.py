@@ -25,4 +25,4 @@ class Config:
     # GTM configuration
     GTM_DIR = SOURCES_DIR / 'gtm'
     GTM_SERVER_JSON = GTM_DIR / 'GTM-P32K5GT_workspace486.json'  # Server-side
-    GTM_CLIENT_JSON = GTM_DIR / 'GTM-NRGXLJ_workspace1002673.json'  # Client-side 
+    GTM_CLIENT_JSON = GTM_DIR / 'GTM-NRGXLJ_workspace1002783.json'  # Client-side

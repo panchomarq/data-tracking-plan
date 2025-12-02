@@ -3,83 +3,92 @@
 {% block title %}Amplitude Analytics - Data Tracking Plan{% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="row mb-5 animate-fade-in">
     <div class="col-12">
-        <h1 class="mb-4">
-            <i class="fas fa-chart-line me-2 text-primary"></i>
-            Amplitude Analytics
-        </h1>
-        <p class="lead text-muted mb-4">
-            Comprehensive analysis of Amplitude events, properties, and tracking configuration
+        <div class="d-flex align-items-center mb-2">
+            <div class="p-2 bg-primary-custom rounded-3 me-3 text-white">
+                <i class="fas fa-chart-line fa-lg"></i>
+            </div>
+            <h1 class="display-5 fw-bold text-dark mb-0">Amplitude Analytics</h1>
+        </div>
+        <p class="lead text-muted ms-5 ps-2">
+            Deep dive into event tracking, user properties, and schema validation status.
         </p>
     </div>
 </div>
 
 <!-- Overview Cards -->
-<div class="row mb-5">
-    <div class="col-md-3">
-        <div class="card bg-primary text-white">
-            <div class="card-body text-center">
-                <h3>{{ data.overview.total_events }}</h3>
-                <p class="mb-0">Total Events</p>
+<div class="row g-4 mb-5 animate-fade-in">
+    <div class="col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm bg-white h-100 border-start border-4 border-primary">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase fw-bold small mb-2">Total Events</h6>
+                <h2 class="display-6 fw-bold text-dark mb-0">{{ data.overview.total_events }}</h2>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card bg-info text-white">
-            <div class="card-body text-center">
-                <h3>{{ data.overview.unique_properties }}</h3>
-                <p class="mb-0">Unique Properties</p>
+    <div class="col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm bg-white h-100 border-start border-4 border-info">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase fw-bold small mb-2">Unique Properties</h6>
+                <h2 class="display-6 fw-bold text-dark mb-0">{{ data.overview.unique_properties }}</h2>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card bg-success text-white">
-            <div class="card-body text-center">
-                <h3>{{ data.overview.active_events }}</h3>
-                <p class="mb-0">Active Events</p>
+    <div class="col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm bg-white h-100 border-start border-4 border-success">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase fw-bold small mb-2">Active Events</h6>
+                <h2 class="display-6 fw-bold text-dark mb-0">{{ data.overview.active_events }}</h2>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card bg-warning text-white">
-            <div class="card-body text-center">
-                <h3>{{ data.overview.categories_count }}</h3>
-                <p class="mb-0">Categories</p>
+    <div class="col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm bg-white h-100 border-start border-4 border-warning">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase fw-bold small mb-2">Categories</h6>
+                <h2 class="display-6 fw-bold text-dark mb-0">{{ data.overview.categories_count }}</h2>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Navigation Tabs -->
-<ul class="nav nav-tabs mb-4" id="amplitudeTabs" role="tablist">
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-bottom pt-4 pb-0 px-4">
+        <ul class="nav nav-tabs card-header-tabs border-0 gap-4" id="amplitudeTabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab">
-            <i class="fas fa-list me-1"></i>Events ({{ data.events_summary.total_events }})
+                <button class="nav-link active border-0 bg-transparent pb-3 fw-medium" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab">
+                    <i class="fas fa-list me-2"></i>Events <span class="badge bg-light text-dark ms-2">{{ data.events_summary.total_events }}</span>
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="properties-tab" data-bs-toggle="tab" data-bs-target="#properties" type="button" role="tab">
-            <i class="fas fa-cogs me-1"></i>Properties ({{ data.properties_summary.unique_properties }})
+                <button class="nav-link border-0 bg-transparent pb-3 fw-medium" id="properties-tab" data-bs-toggle="tab" data-bs-target="#properties" type="button" role="tab">
+                    <i class="fas fa-cogs me-2"></i>Properties <span class="badge bg-light text-dark ms-2">{{ data.properties_summary.unique_properties }}</span>
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
-            <i class="fas fa-chart-pie me-1"></i>Analytics
+                <button class="nav-link border-0 bg-transparent pb-3 fw-medium" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
+                    <i class="fas fa-chart-pie me-2"></i>Analytics
         </button>
     </li>
 </ul>
+    </div>
 
+    <div class="card-body p-4">
 <div class="tab-content" id="amplitudeTabContent">
     <!-- Events Tab -->
     <div class="tab-pane fade show active" id="events" role="tabpanel">
-        <div class="row mb-3">
+                <div class="row g-3 mb-4">
             <div class="col-md-4">
-                <input type="text" class="form-control table-search" placeholder="Search events..." id="events-search">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" class="form-control table-search border-start-0 bg-light" placeholder="Search events..." id="events-search">
+                        </div>
             </div>
             <div class="col-md-2">
-                <select class="form-select filter-dropdown" data-filter="activity">
-                    <option value="">All Activity Status</option>
+                        <select class="form-select filter-dropdown bg-light" data-filter="activity">
+                            <option value="">All Status</option>
                     {% for status in data.events_summary.activity_status.keys() %}
                         {% if status %}
                             <option value="{{ status }}">{{ status }}</option>
@@ -88,7 +97,7 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <select class="form-select filter-dropdown" data-filter="category">
+                        <select class="form-select filter-dropdown bg-light" data-filter="category">
                     <option value="">All Categories</option>
                     {% for category in data.events_summary.categories.keys() %}
                         {% if category %}
@@ -98,7 +107,7 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <select class="form-select filter-dropdown" data-filter="schema">
+                        <select class="form-select filter-dropdown bg-light" data-filter="schema">
                     <option value="">All Schema Status</option>
                     {% for status in data.events_summary.schema_status.keys() %}
                         {% if status %}
@@ -109,18 +118,18 @@
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-striped data-table" id="events-table">
-                <thead>
-                    <tr>
-                        <th>Event Name</th>
-                        <th>Display Name</th>
-                        <th>Category</th>
-                        <th>Owner</th>
-                        <th>Activity Status</th>
-                        <th>Schema Status</th>
-                        <th>180d Volume</th>
-                        <th>Actions</th>
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle data-table" id="events-table">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 rounded-start">Event Name</th>
+                                <th class="border-0">Display Name</th>
+                                <th class="border-0">Category</th>
+                                <th class="border-0">Owner</th>
+                                <th class="border-0">Status</th>
+                                <th class="border-0">Schema</th>
+                                <th class="border-0">Volume (180d)</th>
+                                <th class="border-0 rounded-end text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -129,64 +138,67 @@
                         data-category="{{ event.category or 'Uncategorized' }}"
                         data-schema="{{ event.schema_status or 'UNKNOWN' }}">
                         <td>
-                            <code class="text-primary">{{ event.name }}</code>
+                                    <code class="text-primary-custom fw-bold">{{ event.name }}</code>
                         </td>
                         <td>
-                            <strong>{{ event.display_name or 'No display name' }}</strong>
+                                    <span class="fw-medium">{{ event.display_name or '—' }}</span>
                         </td>
                         <td>
                             {% if event.category %}
-                                <span class="badge bg-secondary">{{ event.category }}</span>
+                                        <span class="badge bg-light text-dark border">{{ event.category }}</span>
                             {% else %}
-                                <span class="text-muted">Uncategorized</span>
+                                        <span class="text-muted small">Uncategorized</span>
                             {% endif %}
                         </td>
                         <td>
                             {% if event.owner %}
-                                <span class="badge bg-light text-dark">{{ event.owner }}</span>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-light text-secondary me-2" style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;">
+                                                {{ event.owner|string|first|upper }}
+                                            </div>
+                                            <span class="small">{{ event.owner }}</span>
+                                        </div>
                             {% else %}
-                                <span class="text-muted">No owner</span>
+                                        <span class="text-muted small">—</span>
                             {% endif %}
                         </td>
                         <td>
                             {% if event.activity == 'ACTIVE' %}
-                                <span class="badge bg-success">
+                                        <span class="badge bg-success-custom bg-opacity-10 text-success-custom">
                                     <i class="fas fa-check me-1"></i>Active
                                 </span>
                             {% elif event.activity == 'DELETED' %}
-                                <span class="badge bg-danger">
+                                        <span class="badge bg-danger bg-opacity-10 text-danger">
                                     <i class="fas fa-trash me-1"></i>Deleted
                                 </span>
                             {% else %}
-                                <span class="badge bg-secondary">{{ event.activity or 'Unknown' }}</span>
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary">{{ event.activity or 'Unknown' }}</span>
                             {% endif %}
                         </td>
                         <td>
                             {% if event.schema_status == 'ENABLED' %}
-                                <span class="badge bg-success">
-                                    <i class="fas fa-check-circle me-1"></i>Enabled
-                                </span>
+                                        <i class="fas fa-check-circle text-success-custom" data-bs-toggle="tooltip" title="Enabled"></i>
                             {% elif event.schema_status == 'DISABLED' %}
-                                <span class="badge bg-warning">
-                                    <i class="fas fa-exclamation-circle me-1"></i>Disabled
-                                </span>
+                                        <i class="fas fa-ban text-muted" data-bs-toggle="tooltip" title="Disabled"></i>
                             {% else %}
-                                <span class="badge bg-secondary">{{ event.schema_status or 'Unknown' }}</span>
+                                        <i class="fas fa-question-circle text-warning-custom" data-bs-toggle="tooltip" title="{{ event.schema_status }}"></i>
                             {% endif %}
                         </td>
                         <td>
-                            {% if event.volume_180_days %}
-                                <span class="badge bg-info">{{ "{:,}".format(event.volume_180_days) }}</span>
+                                    <span class="font-monospace small">
+                                        {% if event.volume_180_days and event.volume_180_days|string|length > 0 and event.volume_180_days|string != '0' %}
+                                            {{ "{:,}".format(event.volume_180_days|int) }}
                             {% else %}
-                                <span class="badge bg-light text-dark">0</span>
+                                            0
                             {% endif %}
+                                    </span>
                         </td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" 
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-light text-primary-custom" 
                                     onclick="showEventDetails('{{ event.name }}')" 
                                     data-bs-toggle="modal" 
                                     data-bs-target="#eventModal">
-                                <i class="fas fa-eye me-1"></i>Details
+                                        Details
                             </button>
                         </td>
                     </tr>
@@ -198,87 +210,67 @@
 
     <!-- Properties Tab -->
     <div class="tab-pane fade" id="properties" role="tabpanel">
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <input type="text" class="form-control table-search" placeholder="Search properties..." id="properties-search">
+                <div class="row g-3 mb-4">
+            <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" class="form-control table-search border-start-0 bg-light" placeholder="Search properties..." id="properties-search">
+                        </div>
             </div>
-            <div class="col-md-3">
-                <select class="form-select filter-dropdown" data-filter="type">
+            <div class="col-md-4">
+                        <select class="form-select filter-dropdown bg-light" data-filter="type">
                     <option value="">All Types</option>
                     {% for prop_type in data.properties_summary.value_types.keys() %}
                         <option value="{{ prop_type }}">{{ prop_type }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-3">
-                <select class="form-select filter-dropdown" data-filter="required">
-                    <option value="">All Requirements</option>
-                    <option value="true">Required</option>
-                    <option value="false">Optional</option>
-                </select>
-            </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-striped data-table" id="properties-table">
-                <thead>
-                    <tr>
-                        <th>Property Name</th>
-                        <th>Event</th>
-                        <th>Description</th>
-                        <th>Type</th>
-                        <th>Required</th>
-                        <th>Array</th>
-                        <th>Schema Status</th>
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle data-table" id="properties-table">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 rounded-start">Property Name</th>
+                                <th class="border-0">Description</th>
+                                <th class="border-0">Type</th>
+                                <th class="border-0">Array</th>
+                                <th class="border-0">Schema</th>
+                                <th class="border-0 rounded-end">Usage Count</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for event_name, properties in data.properties_by_event.items() %}
-                        {% for property in properties %}
-                        <tr data-type="{{ property.type }}" data-required="{{ property.required|lower }}">
-                            <td>
-                                <code class="text-primary">{{ property.name }}</code>
-                            </td>
-                            <td>
-                                <span class="badge bg-light text-dark">{{ event_name }}</span>
-                            </td>
-                            <td>
-                                {{ property.description or 'No description' }}
-                            </td>
-                            <td>
-                                <span class="badge bg-secondary">{{ property.type or 'Unknown' }}</span>
-                            </td>
-                            <td>
-                                {% if property.required %}
-                                    <span class="badge bg-danger">
-                                        <i class="fas fa-exclamation me-1"></i>Required
+                    {% for property in data.unique_properties_list %}
+                    <tr data-type="{{ property.type }}">
+                        <td>
+                                    <code class="text-primary-custom fw-bold">{{ property.name }}</code>
+                        </td>
+                        <td>
+                                    <span class="text-muted small text-truncate d-inline-block" style="max-width: 300px;" title="{{ property.description }}">
+                                        {{ property.description or '—' }}
                                     </span>
-                                {% else %}
-                                    <span class="badge bg-success">
-                                        <i class="fas fa-check me-1"></i>Optional
-                                    </span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if property.is_array %}
-                                    <span class="badge bg-info">
-                                        <i class="fas fa-list me-1"></i>Array
-                                    </span>
-                                {% else %}
-                                    <span class="badge bg-light text-dark">Single</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if property.schema_status == 'ENABLED' %}
-                                    <span class="badge bg-success">Enabled</span>
-                                {% elif property.schema_status == 'DISABLED' %}
-                                    <span class="badge bg-warning">Disabled</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">{{ property.schema_status or 'Unknown' }}</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
+                        </td>
+                        <td>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary">{{ property.type or 'Unknown' }}</span>
+                        </td>
+                        <td>
+                            {% if property.is_array %}
+                                        <i class="fas fa-check text-info" title="Yes"></i>
+                            {% else %}
+                                        <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if property.schema_status == 'ENABLED' %}
+                                        <i class="fas fa-check-circle text-success-custom"></i>
+                            {% else %}
+                                        <i class="fas fa-ban text-muted"></i>
+                            {% endif %}
+                        </td>
+                        <td>
+                                    <span class="badge bg-light text-dark border">{{ property.event_count }} Events</span>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -287,70 +279,84 @@
 
     <!-- Analytics Tab -->
     <div class="tab-pane fade" id="analytics" role="tabpanel">
-        <div class="row">
+                <div class="row g-4">
             <div class="col-md-6">
-                <div class="chart-container">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
                     <div id="amplitude-activity-chart"></div>
+                            </div>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="chart-container">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
                     <div id="amplitude-types-chart"></div>
                 </div>
             </div>
         </div>
-        
-        <div class="row mt-4">
             <div class="col-md-6">
-                <div class="chart-container">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
                     <div id="amplitude-schema-chart"></div>
+                            </div>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="chart-container">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
                     <div id="amplitude-categories-chart"></div>
+                            </div>
                 </div>
             </div>
         </div>
 
         <div class="row mt-4">
             <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="fas fa-chart-bar me-2"></i>
-                            Event Analysis Summary
+                        <div class="card border-0 shadow-sm bg-light">
+                            <div class="card-body p-4">
+                                <h5 class="card-title fw-bold mb-4">
+                                    <i class="fas fa-info-circle me-2 text-primary-custom"></i>Summary Insights
                         </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
+                                <div class="row g-4">
                             <div class="col-md-4">
-                                <div class="info-box">
-                                    <h6>Top Event Owners</h6>
-                                    <ul class="list-unstyled">
+                                        <h6 class="text-uppercase text-muted small fw-bold">Top Event Owners</h6>
+                                        <ul class="list-group list-group-flush bg-transparent">
                                         {% for owner, count in data.events_summary.top_owners.items() %}
-                                        <li>
-                                            <strong>{{ owner or 'No owner' }}</strong>
-                                            <span class="badge bg-primary">{{ count }} events</span>
+                                            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                                                <span>{{ owner or 'No owner' }}</span>
+                                                <span class="badge bg-primary-custom rounded-pill">{{ count }}</span>
                                         </li>
                                         {% endfor %}
                                     </ul>
-                                </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="info-box">
-                                    <h6>Event Activity Breakdown</h6>
+                                        <h6 class="text-uppercase text-muted small fw-bold">Event Activity</h6>
+                                        <ul class="list-group list-group-flush bg-transparent">
                                     {% for status, count in data.events_summary.activity_status.items() %}
-                                    <p><strong>{{ status }}:</strong> {{ count }} events</p>
+                                            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                                                <span>{{ status }}</span>
+                                                <span class="badge bg-secondary rounded-pill">{{ count }}</span>
+                                            </li>
                                     {% endfor %}
-                                </div>
+                                        </ul>
                             </div>
                             <div class="col-md-4">
-                                <div class="info-box">
-                                    <h6>Data Quality</h6>
-                                    <p><strong>Total Properties:</strong> {{ data.properties_summary.total_properties }}</p>
-                                    <p><strong>Unique Properties:</strong> {{ data.properties_summary.unique_properties }}</p>
-                                    <p><strong>Array Properties:</strong> {{ data.properties_summary.array_properties_count }}</p>
+                                        <h6 class="text-uppercase text-muted small fw-bold">Data Quality</h6>
+                                        <ul class="list-group list-group-flush bg-transparent">
+                                            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                                                <span>Total Properties</span>
+                                                <span class="fw-bold">{{ data.properties_summary.total_properties }}</span>
+                                            </li>
+                                            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                                                <span>Unique Properties</span>
+                                                <span class="fw-bold">{{ data.properties_summary.unique_properties }}</span>
+                                            </li>
+                                            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                                                <span>Array Properties</span>
+                                                <span class="fw-bold">{{ data.properties_summary.array_properties_count }}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -362,15 +368,20 @@
 </div>
 
 <!-- Event Details Modal -->
-<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+<div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="eventModalLabel">Event Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="eventModalBody">
+            <div class="modal-body p-4" id="eventModalBody">
                 <!-- Content will be loaded dynamically -->
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary-custom" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -378,10 +389,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript">
-// Store data for charts
-</script>
-
 <!-- Data injection scripts -->
 <script type="text/javascript">
 /* eslint-disable */
@@ -401,7 +408,6 @@ function showEventDetails(eventName) {
     var propertiesByEvent = window.propertiesByEventData;
     var event = null;
     
-    // Find the event
     for (var i = 0; i < events.length; i++) {
         if (events[i].name === eventName) {
             event = events[i];
@@ -410,131 +416,111 @@ function showEventDetails(eventName) {
     }
     
     if (event) {
-        var modalContent = '<div class="row">' +
-            '<div class="col-md-6">' +
-            '<h6>Event Information</h6>' +
-            '<p><strong>Name:</strong> <code>' + event.name + '</code></p>' +
-            '<p><strong>Display Name:</strong> ' + (event.display_name || 'No display name') + '</p>' +
-            '<p><strong>Category:</strong> ' + (event.category || 'Uncategorized') + '</p>' +
-            '<p><strong>Owner:</strong> ' + (event.owner || 'No owner') + '</p>' +
-            '<p><strong>Description:</strong> ' + (event.description || 'No description') + '</p>' +
-            '</div>' +
-            '<div class="col-md-6">' +
-            '<h6>Event Status</h6>' +
-            '<p><strong>Activity:</strong> ' + (event.activity || 'Unknown') + '</p>' +
-            '<p><strong>Schema Status:</strong> ' + (event.schema_status || 'Unknown') + '</p>' +
-            '<p><strong>180d Volume:</strong> ' + (event.volume_180_days ? Number(event.volume_180_days).toLocaleString() : '0') + '</p>' +
-            '<p><strong>180d Queries:</strong> ' + (event.queries_180_days ? Number(event.queries_180_days).toLocaleString() : '0') + '</p>' +
-            '<p><strong>First Seen:</strong> ' + (event.first_seen || 'Unknown') + '</p>' +
-            '<p><strong>Last Seen:</strong> ' + (event.last_seen || 'Unknown') + '</p>' +
-            '</div>' +
-            '</div>';
+        var modalContent = `
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Event Information</h6>
+                    <div class="mb-2">
+                        <span class="text-muted small d-block">Name</span>
+                        <code class="text-primary-custom fw-bold fs-6">${event.name}</code>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-muted small d-block">Display Name</span>
+                        <span class="fw-medium">${event.display_name || '—'}</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-muted small d-block">Category</span>
+                        <span class="badge bg-light text-dark border">${event.category || 'Uncategorized'}</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-muted small d-block">Owner</span>
+                        <span>${event.owner || '—'}</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-muted small d-block">Description</span>
+                        <p class="small mb-0">${event.description || '—'}</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Metrics & Status</h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="p-2 bg-light rounded text-center">
+                                <span class="d-block small text-muted">Activity</span>
+                                <span class="fw-bold ${event.activity === 'ACTIVE' ? 'text-success' : 'text-muted'}">${event.activity || 'Unknown'}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 bg-light rounded text-center">
+                                <span class="d-block small text-muted">Schema</span>
+                                <span class="fw-bold">${event.schema_status || 'Unknown'}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 bg-light rounded text-center">
+                                <span class="d-block small text-muted">180d Volume</span>
+                                <span class="fw-bold">${event.volume_180_days ? Number(event.volume_180_days).toLocaleString() : '0'}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 bg-light rounded text-center">
+                                <span class="d-block small text-muted">180d Queries</span>
+                                <span class="fw-bold">${event.queries_180_days ? Number(event.queries_180_days).toLocaleString() : '0'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 small">
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span class="text-muted">First Seen</span>
+                            <span>${event.first_seen || 'Unknown'}</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2">
+                            <span class="text-muted">Last Seen</span>
+                            <span>${event.last_seen || 'Unknown'}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
         
-        if (propertiesByEvent[eventName]) {
-            modalContent += '<hr><h6>Event Properties</h6><div class="table-responsive"><table class="table table-sm"><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Array</th><th>Schema Status</th></tr></thead><tbody>';
+        if (propertiesByEvent[eventName] && propertiesByEvent[eventName].length > 0) {
+            modalContent += `
+                <hr class="my-4">
+                <h6 class="text-uppercase text-muted small fw-bold mb-3">Event Properties</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Array</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
             
             var properties = propertiesByEvent[eventName];
             for (var j = 0; j < properties.length; j++) {
                 var prop = properties[j];
-                modalContent += '<tr><td><code>' + prop.name + '</code></td>' +
-                    '<td><span class="badge bg-secondary">' + (prop.type || 'Unknown') + '</span></td>' +
-                    '<td>' + (prop.required ? '<i class="fas fa-exclamation text-danger"></i>' : '<i class="fas fa-check text-success"></i>') + '</td>' +
-                    '<td>' + (prop.is_array ? '<i class="fas fa-list text-info"></i>' : '<i class="fas fa-minus text-muted"></i>') + '</td>' +
-                    '<td>' + (prop.schema_status || 'Unknown') + '</td></tr>';
+                modalContent += `
+                    <tr>
+                        <td><code class="text-primary-custom">${prop.name}</code></td>
+                        <td><span class="badge bg-light text-secondary border">${prop.type || 'Unknown'}</span></td>
+                        <td>${prop.required ? '<i class="fas fa-exclamation-circle text-danger" title="Required"></i>' : '<i class="fas fa-check-circle text-muted" title="Optional"></i>'}</td>
+                        <td>${prop.is_array ? '<i class="fas fa-list text-info"></i>' : ''}</td>
+                    </tr>
+                `;
             }
             
             modalContent += '</tbody></table></div>';
+        } else {
+            modalContent += '<hr class="my-4"><p class="text-muted small text-center mb-0">No properties defined for this event.</p>';
         }
         
         document.getElementById('eventModalBody').innerHTML = modalContent;
-        document.getElementById('eventModalLabel').textContent = 'Event: ' + (event.display_name || event.name);
+        document.getElementById('eventModalLabel').innerHTML = `<i class="fas fa-cube me-2 text-primary-custom"></i>${event.display_name || event.name}`;
     }
 }
-
-// Search functionality
-document.addEventListener('DOMContentLoaded', function() {
-    var eventsSearchInput = document.getElementById('events-search');
-    var propertiesSearchInput = document.getElementById('properties-search');
-    
-    if (eventsSearchInput) {
-        eventsSearchInput.addEventListener('input', function() {
-            var searchTerm = this.value.toLowerCase();
-            var eventsTable = document.getElementById('events-table');
-            var rows = eventsTable.querySelectorAll('tbody tr');
-            
-            rows.forEach(function(row) {
-                var text = row.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    }
-    
-    if (propertiesSearchInput) {
-        propertiesSearchInput.addEventListener('input', function() {
-            var searchTerm = this.value.toLowerCase();
-            var propertiesTable = document.getElementById('properties-table');
-            var rows = propertiesTable.querySelectorAll('tbody tr');
-            
-            rows.forEach(function(row) {
-                var text = row.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    }
-    
-    // Filter functionality
-    var eventFilters = document.querySelectorAll('#events .filter-dropdown');
-    eventFilters.forEach(function(filter) {
-        filter.addEventListener('change', function() {
-            applyFiltersToTable('events-table');
-        });
-    });
-    
-    var propFilters = document.querySelectorAll('#properties .filter-dropdown');
-    propFilters.forEach(function(filter) {
-        filter.addEventListener('change', function() {
-            applyFiltersToTable('properties-table');
-        });
-    });
-    
-    function applyFiltersToTable(tableId) {
-        var table = document.getElementById(tableId);
-        var rows = table.querySelectorAll('tbody tr');
-        var container = table.closest('.tab-pane');
-        var filters = container.querySelectorAll('.filter-dropdown');
-        
-        var activeFilters = {};
-        filters.forEach(function(filter) {
-            if (filter.value) {
-                activeFilters[filter.getAttribute('data-filter')] = filter.value;
-            }
-        });
-        
-        rows.forEach(function(row) {
-            var shouldShow = true;
-            
-            Object.keys(activeFilters).forEach(function(filterKey) {
-                var cellValue = row.getAttribute('data-' + filterKey);
-                if (cellValue !== activeFilters[filterKey]) {
-                    shouldShow = false;
-                }
-            });
-            
-            if (shouldShow) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    }
-});
 </script>
 {% endblock %}

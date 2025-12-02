@@ -24,7 +24,17 @@ class AmplitudeParser:
         Load the CSV data into a pandas DataFrame for efficient processing.
         """
         try:
-            self.data = pd.read_csv(self.file_path)
+            # Load CSV, handling potential bad lines and ensuring all columns are read as strings initially to avoid type errors
+            self.data = pd.read_csv(self.file_path, dtype=str, on_bad_lines='skip')
+            self.data = self.data.fillna('')
+            
+            # Normalize column names (strip whitespace)
+            self.data.columns = self.data.columns.str.strip()
+            
+            # Normalize Object Type for filtering
+            if 'Object Type' in self.data.columns:
+                self.data['Object Type'] = self.data['Object Type'].str.strip()
+                
         except Exception as e:
             raise Exception(f"Error loading Amplitude data: {e}")
     
@@ -125,8 +135,8 @@ class AmplitudeParser:
                 'description': row.get('Object Description', ''),
                 'activity': row.get('Event Activity', ''),
                 'schema_status': row.get('Event Schema Status', ''),
-                'volume_180_days': row.get('Event 180 Day Volume', 0),
-                'queries_180_days': row.get('Event 180 Day Queries', 0),
+                'volume_180_days': int(row.get('Event 180 Day Volume', 0)) if str(row.get('Event 180 Day Volume', '0')).strip() else 0,
+                'queries_180_days': int(row.get('Event 180 Day Queries', 0)) if str(row.get('Event 180 Day Queries', '0')).strip() else 0,
                 'first_seen': row.get('Event First Seen', ''),
                 'last_seen': row.get('Event Last Seen', '')
             }
@@ -141,6 +151,12 @@ class AmplitudeParser:
         Returns:
             Dict[str, List[Dict]]: Events as keys, lists of properties as values
         """
+        # We need to look at the raw data to properly associate properties with events
+        # Based on the CSV structure, properties are listed under their parent event
+        # or they have the Object Name filled in.
+        
+        # Let's rely on the Object Name column which should be populated for properties
+        # that belong to a specific event in the exported CSV format
         properties_df = self.data[
             (self.data['Event Property Name'].notna()) & 
             (self.data['Event Property Name'] != '') &
@@ -165,6 +181,51 @@ class AmplitudeParser:
             events_properties[event_name].append(property_info)
         
         return dict(events_properties)
+
+    def get_unique_properties_list(self) -> List[Dict]:
+        """
+        Get list of unique properties across all events.
+        
+        Returns:
+            List[Dict]: List of unique properties with metadata
+        """
+        properties_df = self.data[
+            (self.data['Event Property Name'].notna()) & 
+            (self.data['Event Property Name'] != '')
+        ]
+        
+        unique_props = {}
+        
+        for _, row in properties_df.iterrows():
+            prop_name = row['Event Property Name']
+            
+            if prop_name not in unique_props:
+                unique_props[prop_name] = {
+                    'name': prop_name,
+                    'description': row.get('Property Description', ''),
+                    'type': row.get('Property Value Type', ''),
+                    'is_array': row.get('Property Is Array', False),
+                    'schema_status': row.get('Property Schema Status', ''),
+                    'first_seen': row.get('Property First Seen', ''),
+                    'last_seen': row.get('Property Last Seen', ''),
+                    'event_count': 0
+                }
+            
+            # Update description/type if we have better data (e.g. non-empty)
+            if not unique_props[prop_name]['description'] and row.get('Property Description'):
+                 unique_props[prop_name]['description'] = row.get('Property Description')
+            
+            if not unique_props[prop_name]['type'] and row.get('Property Value Type'):
+                 unique_props[prop_name]['type'] = row.get('Property Value Type')
+
+            # Count event usages
+            # In the Amplitude CSV export, if a property row has an 'Object Name' (Event Name),
+            # it means this property is associated with that event.
+            if row.get('Object Name') and row.get('Object Name').strip():
+                unique_props[prop_name]['event_count'] += 1
+        
+        # Sort by usage count desc
+        return sorted(list(unique_props.values()), key=lambda x: x['event_count'], reverse=True)
     
     def get_platform_overview(self) -> Dict:
         """
@@ -185,4 +246,4 @@ class AmplitudeParser:
             'deleted_events': events_summary['activity_status'].get('DELETED', 0),
             'categories_count': len(events_summary['categories']),
             'last_updated': 'July 17, 2025'  # Based on filename timestamp
-        } 
+        }

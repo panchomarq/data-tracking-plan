@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}GTM {{ container_type|title }} - Data Tracking Plan{% endblock %}
+
+{% block content %}
+<div class="row mb-4 animate-fade-in">
+    <div class="col-12">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <a href="{{ url_for('web.gtm_overview') }}" class="btn btn-light btn-sm me-3 rounded-circle" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <h1 class="h3 fw-bold text-dark mb-0">
+                            {% if container_type == 'server' %}
+                                <i class="fas fa-server me-2 text-dark"></i>Server-Side Container
+                            {% else %}
+                                <i class="fas fa-laptop-code me-2 text-primary-custom"></i>Client-Side Container
+                            {% endif %}
+                        </h1>
+                    </div>
+                    <p class="text-muted mb-0 small">
+                        {{ data.overview.container_name }} <span class="mx-2">•</span> {{ data.overview.public_id }}
+                    </p>
+                </div>
+            </div>
+            <div>
+                <span class="badge bg-light text-dark border">
+                    Last Updated: {{ data.overview.last_updated }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5 animate-fade-in">
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm bg-white h-100 border-bottom border-4 border-warning">
+            <div class="card-body text-center p-4">
+                <div class="mb-2 text-warning-custom opacity-75"><i class="fas fa-tag fa-2x"></i></div>
+                <h2 class="fw-bold mb-0">{{ data.overview.total_tags }}</h2>
+                <small class="text-muted text-uppercase fw-bold">Tags</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm bg-white h-100 border-bottom border-4 border-info">
+            <div class="card-body text-center p-4">
+                <div class="mb-2 text-info opacity-75"><i class="fas fa-bolt fa-2x"></i></div>
+                <h2 class="fw-bold mb-0">{{ data.overview.total_triggers }}</h2>
+                <small class="text-muted text-uppercase fw-bold">Triggers</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm bg-white h-100 border-bottom border-4 border-secondary">
+            <div class="card-body text-center p-4">
+                <div class="mb-2 text-secondary opacity-75"><i class="fas fa-code fa-2x"></i></div>
+                <h2 class="fw-bold mb-0">{{ data.overview.total_variables }}</h2>
+                <small class="text-muted text-uppercase fw-bold">Variables</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm bg-white h-100 border-bottom border-4 border-success">
+            <div class="card-body text-center p-4">
+                <div class="mb-2 text-success-custom opacity-75"><i class="fas fa-check-circle fa-2x"></i></div>
+                <h2 class="fw-bold mb-0">{{ data.overview.active_tags }}</h2>
+                <small class="text-muted text-uppercase fw-bold">Active Tags</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 animate-fade-in">
+    <!-- Charts Section -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div id="gtm-tags-chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tags List -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="card-title fw-bold mb-0">Tags Configuration</h5>
+                <div class="input-group" style="max-width: 250px;">
+                    <span class="input-group-text bg-light border-end-0 small"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control form-control-sm border-start-0 bg-light table-search" placeholder="Search tags...">
+                </div>
+            </div>
+            <div class="table-responsive data-table">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Tag Name</th>
+                            <th>Type</th>
+                            <th>Firing Triggers</th>
+                            <th class="text-end pe-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tag in data.tags_list %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-medium text-dark">{{ tag.name }}</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-secondary border">{{ tag.type }}</span>
+                            </td>
+                            <td>
+                                {% if tag.firing_triggers %}
+                                    <div class="d-flex flex-wrap gap-1">
+                                    {% for trigger in tag.firing_triggers[:2] %}
+                                        <span class="badge bg-info bg-opacity-10 text-info small">{{ trigger }}</span>
+                                    {% endfor %}
+                                    {% if tag.firing_triggers|length > 2 %}
+                                        <span class="badge bg-light text-muted border small">+{{ tag.firing_triggers|length - 2 }}</span>
+                                    {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted small italic">No firing triggers</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-4">
+                                {% if tag.paused %}
+                                    <span class="badge bg-warning-custom bg-opacity-10 text-warning-custom">Paused</span>
+                                {% else %}
+                                    <span class="badge bg-success-custom bg-opacity-10 text-success-custom">Active</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+/* eslint-disable */
+window.gtmTagsData = {{ (data.overview.tag_types or {}) | tojson | safe }};
+/* eslint-enable */
+</script>
+{% endblock %}

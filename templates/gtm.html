@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}GTM Overview - Data Tracking Plan{% endblock %}
+
+{% block content %}
+<div class="row mb-5 animate-fade-in">
+    <div class="col-12">
+        <div class="d-flex align-items-center mb-2">
+            <div class="p-2 bg-warning-custom rounded-3 me-3 text-white">
+                <i class="fas fa-tags fa-lg"></i>
+            </div>
+            <h1 class="display-5 fw-bold text-dark mb-0">Google Tag Manager</h1>
+        </div>
+        <p class="lead text-muted ms-5 ps-2">
+            Overview of your Server-Side and Client-Side GTM containers.
+        </p>
+    </div>
+</div>
+
+<div class="row g-4 animate-fade-in">
+    <!-- Server-side Container -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100 overflow-hidden">
+            <div class="card-header bg-dark text-white p-4 d-flex justify-content-between align-items-center border-0">
+                <div class="d-flex align-items-center">
+                    <div class="p-2 bg-white bg-opacity-10 rounded me-3">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold">Server-Side</h5>
+                        <small class="opacity-75">Container</small>
+                    </div>
+                </div>
+                {% if data.server %}
+                    <span class="badge bg-success">Active</span>
+                {% else %}
+                    <span class="badge bg-secondary">Not Configured</span>
+                {% endif %}
+            </div>
+            <div class="card-body p-4">
+                {% if data.server %}
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <div>
+                            <h6 class="fw-bold mb-1">{{ data.server.overview.container_name }}</h6>
+                            <small class="text-muted font-monospace">{{ data.server.overview.public_id }}</small>
+                        </div>
+                        <a href="{{ url_for('web.gtm_detail', container_type='server') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                            View Details <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-4">
+                            <div class="p-3 bg-light rounded text-center h-100">
+                                <h3 class="fw-bold mb-0">{{ data.server.overview.total_tags }}</h3>
+                                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Total Tags</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 bg-success-custom bg-opacity-10 rounded text-center h-100">
+                                <h3 class="fw-bold mb-0 text-success-custom">{{ data.server.overview.active_tags }}</h3>
+                                <small class="text-success-custom text-uppercase fw-bold" style="font-size: 0.7rem;">Active</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 bg-warning-custom bg-opacity-10 rounded text-center h-100">
+                                <h3 class="fw-bold mb-0 text-warning-custom">{{ data.server.overview.paused_tags }}</h3>
+                                <small class="text-warning-custom text-uppercase fw-bold" style="font-size: 0.7rem;">Paused</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center justify-content-between p-3 border rounded">
+                                <span class="text-muted">Triggers</span>
+                                <span class="fw-bold">{{ data.server.overview.total_triggers }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center justify-content-between p-3 border rounded">
+                                <span class="text-muted">Variables</span>
+                                <span class="fw-bold">{{ data.server.overview.total_variables }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="mb-3 text-muted opacity-25">
+                            <i class="fas fa-server fa-4x"></i>
+                        </div>
+                        <h6 class="text-muted">No Configuration Found</h6>
+                        <p class="small text-muted">Add a server-side container export to the sources directory.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Client-side Container -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100 overflow-hidden">
+            <div class="card-header bg-primary-custom text-white p-4 d-flex justify-content-between align-items-center border-0">
+                <div class="d-flex align-items-center">
+                    <div class="p-2 bg-white bg-opacity-10 rounded me-3">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold">Client-Side</h5>
+                        <small class="opacity-75">Container</small>
+                    </div>
+                </div>
+                {% if data.client %}
+                    <span class="badge bg-success">Active</span>
+                {% else %}
+                    <span class="badge bg-secondary">Not Configured</span>
+                {% endif %}
+            </div>
+            <div class="card-body p-4">
+                {% if data.client %}
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <div>
+                            <h6 class="fw-bold mb-1">{{ data.client.overview.container_name }}</h6>
+                            <small class="text-muted font-monospace">{{ data.client.overview.public_id }}</small>
+                        </div>
+                        <a href="{{ url_for('web.gtm_detail', container_type='client') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                            View Details <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-4">
+                            <div class="p-3 bg-light rounded text-center h-100">
+                                <h3 class="fw-bold mb-0">{{ data.client.overview.total_tags }}</h3>
+                                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Total Tags</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 bg-success-custom bg-opacity-10 rounded text-center h-100">
+                                <h3 class="fw-bold mb-0 text-success-custom">{{ data.client.overview.active_tags }}</h3>
+                                <small class="text-success-custom text-uppercase fw-bold" style="font-size: 0.7rem;">Active</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 bg-warning-custom bg-opacity-10 rounded text-center h-100">
+                                <h3 class="fw-bold mb-0 text-warning-custom">{{ data.client.overview.paused_tags }}</h3>
+                                <small class="text-warning-custom text-uppercase fw-bold" style="font-size: 0.7rem;">Paused</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center justify-content-between p-3 border rounded">
+                                <span class="text-muted">Triggers</span>
+                                <span class="fw-bold">{{ data.client.overview.total_triggers }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center justify-content-between p-3 border rounded">
+                                <span class="text-muted">Variables</span>
+                                <span class="fw-bold">{{ data.client.overview.total_variables }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="mb-3 text-muted opacity-25">
+                            <i class="fas fa-laptop-code fa-4x"></i>
+                        </div>
+                        <h6 class="text-muted">No Configuration Found</h6>
+                        <p class="small text-muted">Add a client-side container export to the sources directory.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

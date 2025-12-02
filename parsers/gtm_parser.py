@@ -174,17 +174,28 @@ class GTMParser:
         if not self.data:
             return []
         
-        tags = self.data.get('containerVersion', {}).get('tag', [])
+        container_version = self.data.get('containerVersion', {})
+        tags = container_version.get('tag', [])
+        triggers = container_version.get('trigger', [])
+        
+        # Create trigger ID to name mapping
+        trigger_map = {trigger.get('triggerId'): trigger.get('name', '') for trigger in triggers}
+        
         tags_list = []
         
         for tag in tags:
+            firing_trigger_ids = tag.get('firingTriggerId', [])
+            blocking_trigger_ids = tag.get('blockingTriggerId', [])
+            
             tag_info = {
                 'name': tag.get('name', ''),
                 'type': tag.get('type', ''),
                 'tag_id': tag.get('tagId', ''),
                 'paused': tag.get('paused', False),
-                'firing_triggers': len(tag.get('firingTriggerId', [])),
-                'blocking_triggers': len(tag.get('blockingTriggerId', [])),
+                'firing_triggers': [trigger_map.get(tid, tid) for tid in firing_trigger_ids],
+                'blocking_triggers': [trigger_map.get(tid, tid) for tid in blocking_trigger_ids],
+                'firing_triggers_count': len(firing_trigger_ids),
+                'blocking_triggers_count': len(blocking_trigger_ids),
                 'parameters_count': len(tag.get('parameter', []))
             }
             

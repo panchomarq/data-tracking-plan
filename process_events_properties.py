@@ -4,49 +4,52 @@
 """
 Property Extractor for Data Tracking Plan
 
-This script extracts and combines property data from Amplitude CSV and Insider JSON files,
+This script extracts and combines property data from Amplitude and Insider using the centralized parsers,
 formatting them to match the Google Sheet structure shown in the tracking plan.
 """
 
-import csv
-import json
 import pandas as pd
 from typing import Dict, List, Set, Any
+from services.parser_manager import parser_manager
 
-
-def extract_amplitude_properties(csv_path: str) -> Set[str]:
+def extract_amplitude_properties(parser) -> Set[str]:
     """
-    Extract event property names from Amplitude CSV file.
+    Extract event property names from Amplitude using the initialized parser.
     
     Args:
-        csv_path: Path to the Amplitude CSV file
+        parser: Initialized AmplitudeParser instance
         
     Returns:
         Set of unique property names
     """
     properties = set()
+    if not parser or parser.data is None:
+        print("Amplitude parser not initialized or no data.")
+        return properties
+        
+    df = parser.data
+    
     try:
-        with open(csv_path, 'r', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                # Check if the row represents an Event Property
-                if row.get('Property Type') == 'Event Property':
-                    # Get the property name from the 'Event Property Name' column
-                    prop_name = row.get('Event Property Name')
-                    if prop_name and prop_name.strip() and is_valid_property_name(prop_name):
-                        properties.add(prop_name)
-                
-                # Check Event Display Name only for special formats like [Guides-Surveys]
-                event_display_name = row.get('Event Display Name')
-                if (event_display_name and 
-                    isinstance(event_display_name, str) and 
-                    event_display_name.strip() and
-                    '[' in event_display_name and 
-                    ']' in event_display_name and
-                    is_valid_property_name(event_display_name)):
-                    properties.add(event_display_name)
+        # Process Event Properties
+        if 'Property Type' in df.columns and 'Event Property Name' in df.columns:
+            # Filter for Event Properties
+            event_props = df[df['Property Type'] == 'Event Property']['Event Property Name'].dropna()
+            for name in event_props:
+                if is_valid_property_name(name):
+                    properties.add(name)
+        
+        # Process Event Display Names (special format like [Guides-Surveys])
+        if 'Event Display Name' in df.columns:
+            display_names = df['Event Display Name'].dropna()
+            for name in display_names:
+                if (isinstance(name, str) and 
+                    '[' in name and 
+                    ']' in name and
+                    is_valid_property_name(name)):
+                    properties.add(name)
+                    
     except Exception as e:
-        print(f"Error reading Amplitude file: {e}")
+        print(f"Error processing Amplitude data: {e}")
     
     return properties
 
@@ -86,55 +89,58 @@ def is_valid_property_name(name: str) -> bool:
     return True
 
 
-def extract_insider_properties(json_path: str) -> Set[str]:
+def extract_insider_properties(parser) -> Set[str]:
     """
-    Extract property keys from Insider JSON file.
+    Extract property keys from Insider using the initialized parser.
     
     Args:
-        json_path: Path to the Insider JSON file
+        parser: Initialized InsiderParser instance
         
     Returns:
         Set of unique property keys
     """
     properties = set()
+    if not parser or parser.data is None:
+        print("Insider parser not initialized or no data.")
+        return properties
+        
+    data = parser.data
+    
     try:
-        with open(json_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            
-            # Iterate through each event in the JSON
-            for event in data:
-                # Check if the event has a display_name with special format
-                if ('display_name' in event and 
-                    '[' in event['display_name'] and 
-                    ']' in event['display_name'] and
-                    is_valid_property_name(event['display_name'])):
-                    properties.add(event['display_name'])
-                    
-                # Extract event key if it has special format
-                if ('key' in event and 
-                    '[' in event['key'] and 
-                    ']' in event['key'] and
-                    is_valid_property_name(event['key'])):
-                    properties.add(event['key'])
-                    
-                # Check for params list which contains properties
-                if 'params' in event and isinstance(event['params'], list):
-                    for param in event['params']:
-                        # Extract the property key
-                        if ('key' in param and 
-                            param['key'].strip() and
-                            is_valid_property_name(param['key'])):
-                            properties.add(param['key'])
-                            
-                        # Extract the display_name if it has special format
-                        if ('display_name' in param and 
-                            param['display_name'].strip() and
-                            '[' in param['display_name'] and 
-                            ']' in param['display_name'] and
-                            is_valid_property_name(param['display_name'])):
-                            properties.add(param['display_name'])
+        # Iterate through each event in the JSON data
+        for event in data:
+            # Check if the event has a display_name with special format
+            if ('display_name' in event and 
+                '[' in event['display_name'] and 
+                ']' in event['display_name'] and
+                is_valid_property_name(event['display_name'])):
+                properties.add(event['display_name'])
+                
+            # Extract event key if it has special format
+            if ('key' in event and 
+                '[' in event['key'] and 
+                ']' in event['key'] and
+                is_valid_property_name(event['key'])):
+                properties.add(event['key'])
+                
+            # Check for params list which contains properties
+            if 'params' in event and isinstance(event['params'], list):
+                for param in event['params']:
+                    # Extract the property key
+                    if ('key' in param and 
+                        param['key'].strip() and
+                        is_valid_property_name(param['key'])):
+                        properties.add(param['key'])
+                        
+                    # Extract the display_name if it has special format
+                    if ('display_name' in param and 
+                        param['display_name'].strip() and
+                        '[' in param['display_name'] and 
+                        ']' in param['display_name'] and
+                        is_valid_property_name(param['display_name'])):
+                        properties.add(param['display_name'])
     except Exception as e:
-        print(f"Error reading Insider file: {e}")
+        print(f"Error processing Insider data: {e}")
     
     return properties
 
@@ -323,18 +329,17 @@ def generate_html_table(rows: List[Dict[str, str]], output_path: str) -> None:
 
 
 def main():
-    # Define file paths
-    amplitude_path = 'sources/amplitude/amplitude_events.csv'
-    insider_path = 'sources/insider/insider.json'
     output_csv_path = 'property_tracking_plan.csv'
     
-    # Extract properties from both sources
+    # Extract properties from both sources using centralized parsers
     print("Extracting properties from Amplitude...")
-    amplitude_properties = extract_amplitude_properties(amplitude_path)
+    amplitude_parser = parser_manager.get_parser('amplitude')
+    amplitude_properties = extract_amplitude_properties(amplitude_parser)
     print(f"Found {len(amplitude_properties)} unique properties in Amplitude")
     
     print("Extracting properties from Insider...")
-    insider_properties = extract_insider_properties(insider_path)
+    insider_parser = parser_manager.get_parser('insider')
+    insider_properties = extract_insider_properties(insider_parser)
     print(f"Found {len(insider_properties)} unique properties in Insider")
     
     # Get property sources

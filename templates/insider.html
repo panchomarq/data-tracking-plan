@@ -3,334 +3,351 @@
 {% block title %}Insider Analytics - Data Tracking Plan{% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="row mb-5 animate-fade-in">
     <div class="col-12">
-        <h1 class="mb-4">
-            <i class="fas fa-users me-2 text-success"></i>
-            Insider Analytics
-        </h1>
-        <p class="lead text-muted mb-4">
-            Comprehensive analysis of Insider events, parameters, and data compliance
+        <div class="d-flex align-items-center mb-2">
+            <div class="p-2 bg-success-custom rounded-3 me-3 text-white">
+                <i class="fas fa-users fa-lg"></i>
+            </div>
+            <h1 class="display-5 fw-bold text-dark mb-0">Insider Analytics</h1>
+        </div>
+        <p class="lead text-muted ms-5 ps-2">
+            Monitor Insider events, PII compliance, and parameter usage across your implementation.
         </p>
     </div>
 </div>
 
 <!-- Overview Cards -->
-<div class="row mb-5">
-    <div class="col-md-3">
-        <div class="card bg-success text-white">
-            <div class="card-body text-center">
-                <h3>{{ data.overview.total_events }}</h3>
-                <p class="mb-0">Total Events</p>
+<div class="row g-4 mb-5 animate-fade-in">
+    <div class="col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm bg-white h-100 border-start border-4 border-success">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase fw-bold small mb-2">Total Events</h6>
+                <h2 class="display-6 fw-bold text-dark mb-0">{{ data.overview.total_events }}</h2>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card bg-primary text-white">
-            <div class="card-body text-center">
-                <h3>{{ data.overview.unique_properties }}</h3>
-                <p class="mb-0">Unique Parameters</p>
+    <div class="col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm bg-white h-100 border-start border-4 border-primary">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase fw-bold small mb-2">Unique Parameters</h6>
+                <h2 class="display-6 fw-bold text-dark mb-0">{{ data.overview.unique_properties }}</h2>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card bg-warning text-white">
-            <div class="card-body text-center">
-                <h3>{{ data.overview.pii_events }}</h3>
-                <p class="mb-0">PII Events</p>
+    <div class="col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm bg-white h-100 border-start border-4 border-warning">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase fw-bold small mb-2">PII Events</h6>
+                <h2 class="display-6 fw-bold text-dark mb-0">{{ data.overview.pii_events }}</h2>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card bg-info text-white">
-            <div class="card-body text-center">
-                <h3>{{ data.overview.segmentation_events }}</h3>
-                <p class="mb-0">Segmentation Events</p>
+    <div class="col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm bg-white h-100 border-start border-4 border-info">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase fw-bold small mb-2">Segmentation</h6>
+                <h2 class="display-6 fw-bold text-dark mb-0">{{ data.overview.segmentation_events }}</h2>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Navigation Tabs -->
-<ul class="nav nav-tabs mb-4" id="insiderTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab">
-            <i class="fas fa-list me-1"></i>Events ({{ data.overview.total_events }})
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="parameters-tab" data-bs-toggle="tab" data-bs-target="#parameters" type="button" role="tab">
-            <i class="fas fa-cogs me-1"></i>All Parameters ({{ data.overview.unique_properties }})
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
-            <i class="fas fa-chart-pie me-1"></i>Analytics
-        </button>
-    </li>
-</ul>
-
-<div class="tab-content" id="insiderTabContent">
-    <!-- Events Tab -->
-    <div class="tab-pane fade show active" id="events" role="tabpanel">
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <input type="text" class="form-control table-search" placeholder="Search events..." id="events-search">
-            </div>
-            <div class="col-md-3">
-                <select class="form-select filter-dropdown" data-filter="pii">
-                    <option value="">All PII Status</option>
-                    <option value="true">PII Events</option>
-                    <option value="false">Non-PII Events</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select class="form-select filter-dropdown" data-filter="category">
-                    <option value="">All Categories</option>
-                    {% for category in data.events_summary.categories.keys() %}
-                        {% if category %}
-                            <option value="{{ category }}">{{ category }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table table-striped data-table" id="events-table">
-                <thead>
-                    <tr>
-                        <th>Event Key</th>
-                        <th>Display Name</th>
-                        <th>Category</th>
-                        <th>PII</th>
-                        <th>Parameters</th>
-                        <th>PII Params</th>
-                        <th>Segmentation Params</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for event in data.events_list %}
-                    <tr data-pii="{{ event.is_pii|lower }}" data-category="{{ event.category or 'Uncategorized' }}">
-                        <td>
-                            <code class="text-primary">{{ event.key }}</code>
-                        </td>
-                        <td>
-                            <strong>{{ event.display_name or 'No display name' }}</strong>
-                        </td>
-                        <td>
-                            {% if event.category %}
-                                <span class="badge bg-secondary">{{ event.category }}</span>
-                            {% else %}
-                                <span class="text-muted">Uncategorized</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if event.is_pii %}
-                                <span class="badge bg-warning">
-                                    <i class="fas fa-shield-alt me-1"></i>PII
-                                </span>
-                            {% else %}
-                                <span class="badge bg-success">
-                                    <i class="fas fa-check me-1"></i>Safe
-                                </span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <span class="badge bg-primary">{{ event.params_count }}</span>
-                        </td>
-                        <td>
-                            {% if event.pii_params_count > 0 %}
-                                <span class="badge bg-warning">{{ event.pii_params_count }}</span>
-                            {% else %}
-                                <span class="badge bg-light text-dark">0</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if event.segmentation_params_count > 0 %}
-                                <span class="badge bg-info">{{ event.segmentation_params_count }}</span>
-                            {% else %}
-                                <span class="badge bg-light text-dark">0</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" 
-                                    onclick="showEventDetails('{{ event.key }}')" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#eventModal">
-                                <i class="fas fa-eye me-1"></i>Details
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-bottom pt-4 pb-0 px-4">
+        <ul class="nav nav-tabs card-header-tabs border-0 gap-4" id="insiderTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active border-0 bg-transparent pb-3 fw-medium" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab">
+                    <i class="fas fa-list me-2"></i>Events <span class="badge bg-light text-dark ms-2">{{ data.overview.total_events }}</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link border-0 bg-transparent pb-3 fw-medium" id="parameters-tab" data-bs-toggle="tab" data-bs-target="#parameters" type="button" role="tab">
+                    <i class="fas fa-cogs me-2"></i>Parameters <span class="badge bg-light text-dark ms-2">{{ data.overview.unique_properties }}</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link border-0 bg-transparent pb-3 fw-medium" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
+                    <i class="fas fa-chart-pie me-2"></i>Analytics
+                </button>
+            </li>
+        </ul>
     </div>
 
-    <!-- Parameters Tab -->
-    <div class="tab-pane fade" id="parameters" role="tabpanel">
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <input type="text" class="form-control table-search" placeholder="Search parameters..." id="parameters-search">
-            </div>
-            <div class="col-md-3">
-                <select class="form-select filter-dropdown" data-filter="type">
-                    <option value="">All Types</option>
-                    {% for param_type in data.properties_summary.param_types.keys() %}
-                        <option value="{{ param_type }}">{{ param_type }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select class="form-select filter-dropdown" data-filter="pii">
-                    <option value="">All PII Status</option>
-                    <option value="true">PII Parameters</option>
-                    <option value="false">Non-PII Parameters</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table table-striped data-table" id="parameters-table">
-                <thead>
-                    <tr>
-                        <th>Parameter Key</th>
-                        <th>Display Name</th>
-                        <th>Type</th>
-                        <th>PII</th>
-                        <th>Segmentation</th>
-                        <th>Usage Count</th>
-                        <th>Used In Events</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for param in data.unique_parameters_list %}
-                    <tr data-type="{{ param.type }}" data-pii="{{ param.is_pii|lower }}">
-                        <td>
-                            <code class="text-primary">{{ param.key }}</code>
-                        </td>
-                        <td>
-                            {% if param.display_name %}
-                                {{ param.display_name }}
-                                {% if not param.is_type_consistent or not param.is_pii_consistent or not param.is_segment_consistent %}
-                                    <br><small class="text-warning">
-                                        <i class="fas fa-exclamation-triangle me-1"></i>Inconsistent across events
-                                    </small>
-                                {% endif %}
-                            {% else %}
-                                <span class="text-muted">No display name</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if param.is_type_consistent %}
-                                <span class="badge bg-secondary">{{ param.type }}</span>
-                            {% else %}
-                                <span class="badge bg-warning">Mixed</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if param.is_pii_consistent %}
-                                {% if param.is_pii %}
-                                    <span class="badge bg-warning">
-                                        <i class="fas fa-shield-alt me-1"></i>PII
-                                    </span>
-                                {% else %}
-                                    <span class="badge bg-success">
-                                        <i class="fas fa-check me-1"></i>Safe
-                                    </span>
-                                {% endif %}
-                            {% else %}
-                                <span class="badge bg-warning">Mixed</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if param.is_segment_consistent %}
-                                {% if param.show_on_segment %}
-                                    <span class="badge bg-info">
-                                        <i class="fas fa-users me-1"></i>Yes
-                                    </span>
-                                {% else %}
-                                    <span class="badge bg-light text-dark">No</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="badge bg-warning">Mixed</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <span class="badge bg-primary">{{ param.usage_count }}</span>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-info" 
-                                    onclick="showParameterUsageNew('{{ param.key }}')"
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#parameterModal">
-                                <i class="fas fa-list me-1"></i>View Events ({{ param.usage_count }})
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-
-    </div>
-
-    <!-- Analytics Tab -->
-    <div class="tab-pane fade" id="analytics" role="tabpanel">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="chart-container">
-                    <div id="insider-types-chart"></div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="chart-container">
-                    <div id="insider-pii-chart"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="fas fa-chart-bar me-2"></i>
-                            Parameter Usage Analysis
-                        </h5>
+    <div class="card-body p-4">
+        <div class="tab-content" id="insiderTabContent">
+            <!-- Events Tab -->
+            <div class="tab-pane fade show active" id="events" role="tabpanel">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" class="form-control table-search border-start-0 bg-light" placeholder="Search events..." id="events-search">
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="info-box">
-                                    <h6>Most Reused Parameters</h6>
-                                    <ul class="list-unstyled">
-                                        {% for param in data.parameter_usage.most_common_params[:5] %}
-                                        <li>
-                                            <code>{{ param.param }}</code> 
-                                            <span class="badge bg-primary">{{ param.events_count }} events</span>
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
+                    <div class="col-md-3">
+                        <select class="form-select filter-dropdown bg-light" data-filter="pii">
+                            <option value="">All PII Status</option>
+                            <option value="true">PII Events</option>
+                            <option value="false">Non-PII Events</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select filter-dropdown bg-light" data-filter="category">
+                            <option value="">All Categories</option>
+                            {% for category in data.events_summary.categories.keys() %}
+                                {% if category %}
+                                    <option value="{{ category }}">{{ category }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle data-table" id="events-table">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 rounded-start">Event Key</th>
+                                <th class="border-0">Display Name</th>
+                                <th class="border-0">Category</th>
+                                <th class="border-0">Status</th>
+                                <th class="border-0 text-center">Params</th>
+                                <th class="border-0 text-center">PII</th>
+                                <th class="border-0 text-center">Seg</th>
+                                <th class="border-0 rounded-end text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in data.events_list %}
+                            <tr data-pii="{{ event.is_pii|lower }}" data-category="{{ event.category or 'Uncategorized' }}">
+                                <td>
+                                    <code class="text-success-custom fw-bold">{{ event.key }}</code>
+                                </td>
+                                <td>
+                                    <span class="fw-medium">{{ event.display_name or '—' }}</span>
+                                </td>
+                                <td>
+                                    {% if event.category %}
+                                        <span class="badge bg-light text-dark border">{{ event.category }}</span>
+                                    {% else %}
+                                        <span class="text-muted small">Uncategorized</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if event.is_pii %}
+                                        <span class="badge bg-warning-custom bg-opacity-10 text-warning-custom">
+                                            <i class="fas fa-shield-alt me-1"></i>PII
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-success-custom bg-opacity-10 text-success-custom">
+                                            <i class="fas fa-check me-1"></i>Safe
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border">{{ event.params_count }}</span>
+                                </td>
+                                <td class="text-center">
+                                    {% if event.pii_params_count > 0 %}
+                                        <span class="badge bg-warning-custom text-white">{{ event.pii_params_count }}</span>
+                                    {% else %}
+                                        <span class="text-muted small">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if event.segmentation_params_count > 0 %}
+                                        <span class="badge bg-info text-white">{{ event.segmentation_params_count }}</span>
+                                    {% else %}
+                                        <span class="text-muted small">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-light text-success-custom" 
+                                            onclick="showEventDetails('{{ event.key }}')" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#eventModal">
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Parameters Tab -->
+            <div class="tab-pane fade" id="parameters" role="tabpanel">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" class="form-control table-search border-start-0 bg-light" placeholder="Search parameters..." id="parameters-search">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select filter-dropdown bg-light" data-filter="type">
+                            <option value="">All Types</option>
+                            {% for param_type in data.properties_summary.param_types.keys() %}
+                                <option value="{{ param_type }}">{{ param_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select filter-dropdown bg-light" data-filter="pii">
+                            <option value="">All PII Status</option>
+                            <option value="true">PII Parameters</option>
+                            <option value="false">Non-PII Parameters</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle data-table" id="parameters-table">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 rounded-start">Parameter Key</th>
+                                <th class="border-0">Display Name</th>
+                                <th class="border-0">Type</th>
+                                <th class="border-0">PII</th>
+                                <th class="border-0">Segmentation</th>
+                                <th class="border-0">Usage</th>
+                                <th class="border-0 rounded-end text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for param in data.unique_parameters_list %}
+                            <tr data-type="{{ param.type }}" data-pii="{{ param.is_pii|lower }}">
+                                <td>
+                                    <code class="text-success-custom fw-bold">{{ param.key }}</code>
+                                </td>
+                                <td>
+                                    {% if param.display_name %}
+                                        <span class="fw-medium">{{ param.display_name }}</span>
+                                        {% if not param.is_type_consistent or not param.is_pii_consistent or not param.is_segment_consistent %}
+                                            <i class="fas fa-exclamation-triangle text-warning ms-1" title="Inconsistent across events"></i>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted small">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if param.is_type_consistent %}
+                                        <span class="badge bg-light text-secondary border">{{ param.type }}</span>
+                                    {% else %}
+                                        <span class="badge bg-warning-custom bg-opacity-10 text-warning-custom">Mixed</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if param.is_pii_consistent %}
+                                        {% if param.is_pii %}
+                                            <span class="badge bg-warning-custom bg-opacity-10 text-warning-custom">PII</span>
+                                        {% else %}
+                                            <span class="badge bg-success-custom bg-opacity-10 text-success-custom">Safe</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary">Mixed</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if param.is_segment_consistent %}
+                                        {% if param.show_on_segment %}
+                                            <i class="fas fa-check text-info" title="Enabled"></i>
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <i class="fas fa-question text-warning" title="Mixed"></i>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">{{ param.usage_count }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-light text-success-custom" 
+                                            onclick="showParameterUsageNew('{{ param.key }}')"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#parameterModal">
+                                        View Usage
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div class="tab-pane fade" id="analytics" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <div id="insider-types-chart"></div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="info-box">
-                                    <h6>Parameter Distribution</h6>
-                                    <p><strong>Reused:</strong> {{ data.parameter_usage.reused_params_count }} parameters</p>
-                                    <p><strong>Unique:</strong> {{ data.parameter_usage.unique_params_count }} parameters</p>
-                                    <p><strong>Total:</strong> {{ data.parameter_usage.total_unique_params }} parameters</p>
-                                </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <div id="insider-pii-chart"></div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="info-box">
-                                    <h6>Data Compliance</h6>
-                                    <p><strong>PII Parameters:</strong> {{ data.properties_summary.pii_params }}</p>
-                                    <p><strong>Segmentation:</strong> {{ data.properties_summary.segmentation_params }}</p>
-                                    <p><strong>Named Parameters:</strong> {{ data.properties_summary.named_params }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm bg-light">
+                            <div class="card-body p-4">
+                                <h5 class="card-title fw-bold mb-4">
+                                    <i class="fas fa-info-circle me-2 text-success-custom"></i>Usage Analysis
+                                </h5>
+                                <div class="row g-4">
+                                    <div class="col-md-4">
+                                        <h6 class="text-uppercase text-muted small fw-bold">Most Reused Parameters</h6>
+                                        <ul class="list-group list-group-flush bg-transparent">
+                                            {% for param in data.parameter_usage.most_common_params[:5] %}
+                                            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                                                <code class="text-success-custom">{{ param.param }}</code>
+                                                <span class="badge bg-success-custom rounded-pill">{{ param.events_count }}</span>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="text-uppercase text-muted small fw-bold">Parameter Distribution</h6>
+                                        <ul class="list-group list-group-flush bg-transparent">
+                                            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                                                <span>Reused</span>
+                                                <span class="fw-bold">{{ data.parameter_usage.reused_params_count }}</span>
+                                            </li>
+                                            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                                                <span>Unique to Event</span>
+                                                <span class="fw-bold">{{ data.parameter_usage.unique_params_count }}</span>
+                                            </li>
+                                            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                                                <span>Total Unique</span>
+                                                <span class="fw-bold">{{ data.parameter_usage.total_unique_params }}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="text-uppercase text-muted small fw-bold">Compliance</h6>
+                                        <ul class="list-group list-group-flush bg-transparent">
+                                            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                                                <span>PII Parameters</span>
+                                                <span class="fw-bold text-warning">{{ data.properties_summary.pii_params }}</span>
+                                            </li>
+                                            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                                                <span>Segmentation Ready</span>
+                                                <span class="fw-bold text-info">{{ data.properties_summary.segmentation_params }}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -342,14 +359,14 @@
 </div>
 
 <!-- Event Details Modal -->
-<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+<div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="eventModalLabel">Event Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="eventModalBody">
+            <div class="modal-body p-4" id="eventModalBody">
                 <!-- Content will be loaded dynamically -->
             </div>
         </div>
@@ -357,14 +374,14 @@
 </div>
 
 <!-- Parameter Usage Modal -->
-<div class="modal fade" id="parameterModal" tabindex="-1" aria-labelledby="parameterModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="parameterModalLabel">Parameter Usage</h5>
+<div class="modal fade" id="parameterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="parameterModalLabel">Parameter Usage</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="parameterModalBody">
+            <div class="modal-body p-4" id="parameterModalBody">
                 <!-- Content will be loaded dynamically -->
             </div>
         </div>
@@ -373,11 +390,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript">
-// Store data for charts - moved to separate script tags to avoid conflicts
-</script>
-
-<!-- Data injection scripts -->
 <script type="text/javascript">
 /* eslint-disable */
 window.insiderTypesData = {{ (data.properties_summary.param_types or {}) | tojson | safe }};
@@ -398,7 +410,6 @@ function showEventDetails(eventKey) {
     var eventParams = window.eventParamsData;
     var event = null;
     
-    // Find the event
     for (var i = 0; i < events.length; i++) {
         if (events[i].key === eventKey) {
             event = events[i];
@@ -407,49 +418,99 @@ function showEventDetails(eventKey) {
     }
     
     if (event) {
-        var modalContent = '<div class="row">' +
-            '<div class="col-md-6">' +
-            '<h6>Event Information</h6>' +
-            '<p><strong>Key:</strong> <code>' + event.key + '</code></p>' +
-            '<p><strong>Display Name:</strong> ' + (event.display_name || 'No display name') + '</p>' +
-            '<p><strong>Category:</strong> ' + (event.category || 'Uncategorized') + '</p>' +
-            '<p><strong>PII Event:</strong> ' + (event.is_pii ? '<span class="badge bg-warning">Yes</span>' : '<span class="badge bg-success">No</span>') + '</p>' +
-            '</div>' +
-            '<div class="col-md-6">' +
-            '<h6>Parameter Summary</h6>' +
-            '<p><strong>Total Parameters:</strong> ' + event.params_count + '</p>' +
-            '<p><strong>PII Parameters:</strong> ' + event.pii_params_count + '</p>' +
-            '<p><strong>Segmentation Parameters:</strong> ' + event.segmentation_params_count + '</p>' +
-            '</div>' +
-            '</div>';
+        var modalContent = `
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Event Information</h6>
+                    <div class="mb-2">
+                        <span class="text-muted small d-block">Key</span>
+                        <code class="text-success-custom fw-bold fs-6">${event.key}</code>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-muted small d-block">Display Name</span>
+                        <span class="fw-medium">${event.display_name || '—'}</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-muted small d-block">Category</span>
+                        <span class="badge bg-light text-dark border">${event.category || 'Uncategorized'}</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-muted small d-block">Compliance</span>
+                        <span class="badge ${event.is_pii ? 'bg-warning text-dark' : 'bg-success text-white'}">
+                            ${event.is_pii ? 'PII Data' : 'Safe'}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Metrics</h6>
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <div class="p-2 bg-light rounded text-center h-100">
+                                <span class="d-block small text-muted">Total Params</span>
+                                <span class="fw-bold fs-5">${event.params_count}</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 bg-light rounded text-center h-100">
+                                <span class="d-block small text-muted">PII</span>
+                                <span class="fw-bold fs-5 text-warning">${event.pii_params_count}</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 bg-light rounded text-center h-100">
+                                <span class="d-block small text-muted">Segments</span>
+                                <span class="fw-bold fs-5 text-info">${event.segmentation_params_count}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
         
-        if (eventParams[eventKey]) {
-            modalContent += '<hr><h6>Parameters Details</h6><div class="table-responsive"><table class="table table-sm"><thead><tr><th>Key</th><th>Display Name</th><th>Type</th><th>PII</th><th>Segmentation</th></tr></thead><tbody>';
+        if (eventParams[eventKey] && eventParams[eventKey].length > 0) {
+            modalContent += `
+                <hr class="my-4">
+                <h6 class="text-uppercase text-muted small fw-bold mb-3">Parameters Details</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Key</th>
+                                <th>Display Name</th>
+                                <th>Type</th>
+                                <th class="text-center">PII</th>
+                                <th class="text-center">Seg</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
             
             var params = eventParams[eventKey];
             for (var j = 0; j < params.length; j++) {
                 var param = params[j];
-                modalContent += '<tr><td><code>' + param.key + '</code></td>' +
-                    '<td>' + (param.display_name || 'No display name') + '</td>' +
-                    '<td><span class="badge bg-secondary">' + param.type + '</span></td>' +
-                    '<td>' + (param.is_pii ? '<i class="fas fa-shield-alt text-warning"></i>' : '<i class="fas fa-check text-success"></i>') + '</td>' +
-                    '<td>' + (param.show_on_segment ? '<i class="fas fa-users text-info"></i>' : '<i class="fas fa-minus text-muted"></i>') + '</td></tr>';
+                modalContent += `
+                    <tr>
+                        <td><code class="text-success-custom">${param.key}</code></td>
+                        <td>${param.display_name || '—'}</td>
+                        <td><span class="badge bg-light text-secondary border">${param.type}</span></td>
+                        <td class="text-center">${param.is_pii ? '<i class="fas fa-shield-alt text-warning" title="PII"></i>' : '<i class="fas fa-check text-success" title="Safe"></i>'}</td>
+                        <td class="text-center">${param.show_on_segment ? '<i class="fas fa-users text-info" title="Segmentation"></i>' : '<span class="text-muted">-</span>'}</td>
+                    </tr>
+                `;
             }
             
             modalContent += '</tbody></table></div>';
         }
         
         document.getElementById('eventModalBody').innerHTML = modalContent;
-        document.getElementById('eventModalLabel').textContent = 'Event: ' + (event.display_name || event.key);
+        document.getElementById('eventModalLabel').innerHTML = `<i class="fas fa-bolt me-2 text-success-custom"></i>${event.display_name || event.key}`;
     }
 }
 
-// Enhanced parameter usage function for unique parameters
 function showParameterUsageNew(paramKey) {
     var uniqueParams = window.uniqueParamsData;
     var paramData = null;
     
-    // Find the parameter
     for (var i = 0; i < uniqueParams.length; i++) {
         if (uniqueParams[i].key === paramKey) {
             paramData = uniqueParams[i];
@@ -457,151 +518,69 @@ function showParameterUsageNew(paramKey) {
         }
     }
     
-    document.getElementById('parameterModalLabel').textContent = 'Parameter: ' + paramKey;
+    if (!paramData) { return; }
+
+    document.getElementById('parameterModalLabel').innerHTML = `Parameter: <code class="text-success-custom ms-2">${paramKey}</code>`;
     
-    if (!paramData) {
-        document.getElementById('parameterModalBody').innerHTML = '<p class="text-muted">No usage data found for parameter <code>' + paramKey + '</code>.</p>';
-        return;
-    }
-    
-    var modalContent = '<div class="row mb-3">' +
-        '<div class="col-md-6">' +
-        '<h6>Parameter Information</h6>' +
-        '<p><strong>Key:</strong> <code>' + paramData.key + '</code></p>' +
-        '<p><strong>Display Name:</strong> ' + (paramData.display_name || 'No display name') + '</p>' +
-        '<p><strong>Type:</strong> <span class="badge bg-secondary">' + paramData.type + '</span></p>' +
-        '<p><strong>Usage Count:</strong> <span class="badge bg-primary">' + paramData.usage_count + ' events</span></p>' +
-        '</div>' +
-        '<div class="col-md-6">' +
-        '<h6>Data Compliance</h6>' +
-        '<p><strong>PII Status:</strong> ' + (paramData.is_pii ? '<span class="badge bg-warning">PII</span>' : '<span class="badge bg-success">Safe</span>') + '</p>' +
-        '<p><strong>Segmentation:</strong> ' + (paramData.show_on_segment ? '<span class="badge bg-info">Enabled</span>' : '<span class="badge bg-light text-dark">Disabled</span>') + '</p>' +
-        '<p><strong>Consistency:</strong> ' + 
-        (paramData.is_type_consistent && paramData.is_pii_consistent && paramData.is_segment_consistent ? 
-            '<span class="badge bg-success">Consistent</span>' : 
-            '<span class="badge bg-warning">Inconsistent</span>') +
-        '</p>' +
-        '</div>' +
-        '</div>' +
-        '<hr>' +
-        '<h6>Used in Events</h6>' +
-        '<div class="table-responsive">' +
-        '<table class="table table-sm">' +
-        '<thead>' +
-        '<tr>' +
-        '<th>Event Key</th>' +
-        '<th>Event Display Name</th>' +
-        '<th>Parameter Display Name</th>' +
-        '<th>Type</th>' +
-        '<th>PII</th>' +
-        '<th>Segmentation</th>' +
-        '</tr>' +
-        '</thead>' +
-        '<tbody>';
+    var modalContent = `
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <h6 class="text-uppercase text-muted small fw-bold mb-3">Parameter Info</h6>
+                <div class="mb-2">
+                     <span class="text-muted small d-block">Display Name</span>
+                     <span class="fw-medium">${paramData.display_name || '—'}</span>
+                </div>
+                <div class="mb-2">
+                     <span class="text-muted small d-block">Type</span>
+                     <span class="badge bg-secondary">${paramData.type}</span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-uppercase text-muted small fw-bold mb-3">Compliance & Usage</h6>
+                <div class="d-flex gap-2 mb-2">
+                    <span class="badge ${paramData.is_pii ? 'bg-warning text-dark' : 'bg-success text-white'}">
+                        ${paramData.is_pii ? 'PII Data' : 'Safe'}
+                    </span>
+                    <span class="badge ${paramData.show_on_segment ? 'bg-info text-white' : 'bg-light text-dark'}">
+                        ${paramData.show_on_segment ? 'Segmentation' : 'No Segment'}
+                    </span>
+                </div>
+                <div class="mt-2">
+                    <span class="text-muted small">Used in </span>
+                    <span class="fw-bold text-primary">${paramData.usage_count} events</span>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <h6 class="text-uppercase text-muted small fw-bold mb-3">Event Occurrences</h6>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Event Key</th>
+                        <th>Event Name</th>
+                        <th>Type</th>
+                        <th class="text-center">PII</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
     
     var instances = paramData.all_instances;
     for (var k = 0; k < instances.length; k++) {
         var instance = instances[k];
-        modalContent += '<tr>' +
-            '<td><code>' + instance.event_key + '</code></td>' +
-            '<td>' + (instance.event_display_name || 'No display name') + '</td>' +
-            '<td>' + (instance.display_name || 'No display name') + '</td>' +
-            '<td><span class="badge bg-secondary">' + instance.type + '</span></td>' +
-            '<td>' + (instance.is_pii ? '<i class="fas fa-shield-alt text-warning"></i>' : '<i class="fas fa-check text-success"></i>') + '</td>' +
-            '<td>' + (instance.show_on_segment ? '<i class="fas fa-users text-info"></i>' : '<i class="fas fa-minus text-muted"></i>') + '</td>' +
-            '</tr>';
+        modalContent += `
+            <tr>
+                <td><code class="text-dark">${instance.event_key}</code></td>
+                <td>${instance.event_display_name || '—'}</td>
+                <td><span class="badge bg-light text-secondary border">${instance.type}</span></td>
+                <td class="text-center">${instance.is_pii ? '<i class="fas fa-shield-alt text-warning"></i>' : '<i class="fas fa-check text-success"></i>'}</td>
+            </tr>
+        `;
     }
     
     modalContent += '</tbody></table></div>';
-    
     document.getElementById('parameterModalBody').innerHTML = modalContent;
 }
-
-// Search functionality for events table
-document.addEventListener('DOMContentLoaded', function() {
-    var eventsSearchInput = document.getElementById('events-search');
-    var parametersSearchInput = document.getElementById('parameters-search');
-    
-    if (eventsSearchInput) {
-        eventsSearchInput.addEventListener('input', function() {
-            var searchTerm = this.value.toLowerCase();
-            var eventsTable = document.getElementById('events-table');
-            var rows = eventsTable.querySelectorAll('tbody tr');
-            
-            rows.forEach(function(row) {
-                var text = row.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    }
-    
-    if (parametersSearchInput) {
-        parametersSearchInput.addEventListener('input', function() {
-            var searchTerm = this.value.toLowerCase();
-            var parametersTable = document.getElementById('parameters-table');
-            var rows = parametersTable.querySelectorAll('tbody tr');
-            
-            rows.forEach(function(row) {
-                var text = row.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    }
-    
-    // Filter functionality for events
-    var eventFilters = document.querySelectorAll('#events .filter-dropdown');
-    eventFilters.forEach(function(filter) {
-        filter.addEventListener('change', function() {
-            applyFiltersToTable('events-table');
-        });
-    });
-    
-    // Filter functionality for parameters
-    var paramFilters = document.querySelectorAll('#parameters .filter-dropdown');
-    paramFilters.forEach(function(filter) {
-        filter.addEventListener('change', function() {
-            applyFiltersToTable('parameters-table');
-        });
-    });
-    
-    function applyFiltersToTable(tableId) {
-        var table = document.getElementById(tableId);
-        var rows = table.querySelectorAll('tbody tr');
-        var container = table.closest('.tab-pane');
-        var filters = container.querySelectorAll('.filter-dropdown');
-        
-        var activeFilters = {};
-        filters.forEach(function(filter) {
-            if (filter.value) {
-                activeFilters[filter.getAttribute('data-filter')] = filter.value;
-            }
-        });
-        
-        rows.forEach(function(row) {
-            var shouldShow = true;
-            
-            Object.keys(activeFilters).forEach(function(filterKey) {
-                var cellValue = row.getAttribute('data-' + filterKey);
-                if (cellValue !== activeFilters[filterKey]) {
-                    shouldShow = false;
-                }
-            });
-            
-            if (shouldShow) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    }
-});
 </script>
-{% endblock %} 
+{% endblock %}
