@@ -48,75 +48,75 @@
                         <div class="col-6">
                             <div class="p-3 rounded-3 bg-light text-center h-100">
                                 <h3 class="fw-bold mb-0">{{ platform.total_events }}</h3>
-                                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Events</small>
+                                <small class="text-muted text-uppercase fw-bold inline-fix-51">Events</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 rounded-3 bg-light text-center h-100">
                                 <h3 class="fw-bold mb-0">{{ platform.unique_properties }}</h3>
-                                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Properties</small>
+                                <small class="text-muted text-uppercase fw-bold inline-fix-57">Properties</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 rounded-3 bg-success-custom bg-opacity-10 text-center h-100">
                                 <h3 class="fw-bold mb-0 text-success-custom">{{ platform.active_events }}</h3>
-                                <small class="text-success-custom text-uppercase fw-bold" style="font-size: 0.7rem;">Active</small>
+                                <small class="text-success-custom text-uppercase fw-bold inline-fix-63">Active</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 rounded-3 bg-danger bg-opacity-10 text-center h-100">
                                 <h3 class="fw-bold mb-0 text-danger">{{ platform.deleted_events }}</h3>
-                                <small class="text-danger text-uppercase fw-bold" style="font-size: 0.7rem;">Deleted</small>
+                                <small class="text-danger text-uppercase fw-bold inline-fix-69">Deleted</small>
                             </div>
                         </div>
                     {% elif 'Insider' in platform.platform %}
                         <div class="col-6">
                             <div class="p-3 rounded-3 bg-light text-center h-100">
                                 <h3 class="fw-bold mb-0">{{ platform.total_events }}</h3>
-                                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Events</small>
+                                <small class="text-muted text-uppercase fw-bold inline-fix-76">Events</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 rounded-3 bg-light text-center h-100">
                                 <h3 class="fw-bold mb-0">{{ platform.unique_properties }}</h3>
-                                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Params</small>
+                                <small class="text-muted text-uppercase fw-bold inline-fix-82">Params</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 rounded-3 bg-info bg-opacity-10 text-center h-100">
                                 <h3 class="fw-bold mb-0 text-info">{{ platform.custom_params }}</h3>
-                                <small class="text-info text-uppercase fw-bold" style="font-size: 0.7rem;">Custom</small>
+                                <small class="text-info text-uppercase fw-bold inline-fix-88">Custom</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 rounded-3 bg-success-custom bg-opacity-10 text-center h-100">
                                 <h3 class="fw-bold mb-0 text-success-custom">{{ platform.native_params }}</h3>
-                                <small class="text-success-custom text-uppercase fw-bold" style="font-size: 0.7rem;">Native</small>
+                                <small class="text-success-custom text-uppercase fw-bold inline-fix-94">Native</small>
                             </div>
                         </div>
                     {% elif 'GTM' in platform.platform %}
                         <div class="col-6">
                             <div class="p-3 rounded-3 bg-light text-center h-100">
                                 <h3 class="fw-bold mb-0">{{ platform.total_tags }}</h3>
-                                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Tags</small>
+                                <small class="text-muted text-uppercase fw-bold inline-fix-101">Tags</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 rounded-3 bg-light text-center h-100">
                                 <h3 class="fw-bold mb-0">{{ platform.total_variables }}</h3>
-                                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Vars</small>
+                                <small class="text-muted text-uppercase fw-bold inline-fix-107">Vars</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 rounded-3 bg-success-custom bg-opacity-10 text-center h-100">
                                 <h3 class="fw-bold mb-0 text-success-custom">{{ platform.active_tags }}</h3>
-                                <small class="text-success-custom text-uppercase fw-bold" style="font-size: 0.7rem;">Active</small>
+                                <small class="text-success-custom text-uppercase fw-bold inline-fix-113">Active</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 rounded-3 bg-info bg-opacity-10 text-center h-100">
                                 <h3 class="fw-bold mb-0 text-info">{{ platform.total_destinations }}</h3>
-                                <small class="text-info text-uppercase fw-bold" style="font-size: 0.7rem;">Destinations</small>
+                                <small class="text-info text-uppercase fw-bold inline-fix-119">Destinations</small>
                             </div>
                         </div>
                     {% endif %}
@@ -230,7 +230,7 @@
         <div class="card h-100 border-0 shadow-sm">
             <div class="card-body p-4">
                 <h5 class="card-title fw-bold mb-4">Platform Comparison</h5>
-                <div id="platform-comparison-chart" style="width: 100%; height: 400px;"></div>
+                <div class="inline-fix-233" id="platform-comparison-chart"></div>
             </div>
         </div>
     </div>

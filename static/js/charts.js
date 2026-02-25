@@ -264,7 +264,6 @@ function createAmplitudeCharts() {
 function initializeInteractiveElements() {
     initializeTooltips();
     initializeDataTables();
-    initializeFilters();
 }
 
 function initializeTooltips() {
@@ -274,114 +273,211 @@ function initializeTooltips() {
     });
 }
 
-function initializeDataTables() {
-    const tables = document.querySelectorAll('.data-table');
-    tables.forEach(table => {
-        addTableSearch(table);
-        addTablePagination(table);
-    });
-}
+// ---------------------------------------------------------------------------
+// DataTableController — unified search + filter + pagination
+//
+// Replaces the old addTableSearch / applyFilters / showPage functions with a
+// single render pipeline:  filter -> search -> paginate visible rows.
+// ---------------------------------------------------------------------------
 
-function addTableSearch(table) {
-    const searchInput = table.closest('.tab-pane')?.querySelector('.table-search') || 
-                        table.parentElement.parentElement.querySelector('.table-search'); // Fallback
-    
-    if (!searchInput) return;
-    
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const rows = table.querySelectorAll('tbody tr');
-        
-        let visibleCount = 0;
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-                row.style.display = '';
-                row.classList.remove('d-none-filter');
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-                row.classList.add('d-none-filter');
-            }
-        });
-        
-        // If search is active, hide pagination to avoid confusion
-        // or ideally, re-render it. For now, hiding it is safer.
-        const pagination = table.parentElement.nextElementSibling;
-        if (pagination && pagination.classList.contains('pagination-container')) {
-            if (this.value.length > 0) {
-                pagination.style.display = 'none';
-            } else {
-                pagination.style.display = '';
-                // Reset to first page when clearing search
-                // We need to trigger the click event on page 1
-                const firstPageLink = pagination.querySelector('[data-page="1"]');
-                if (firstPageLink) firstPageLink.click();
-            }
-        }
-    });
-}
+class DataTableController {
+    constructor(element) {
+        this.element = element;
+        this.table = element.tagName === 'TABLE'
+            ? element
+            : element.querySelector('table');
+        if (!this.table) return;
 
-function addTablePagination(table) {
-    const rowsPerPage = 20;
-    const rows = table.querySelectorAll('tbody tr');
-    const totalPages = Math.ceil(rows.length / rowsPerPage);
-    
-    if (totalPages <= 1) return;
-    
-    // Check if pagination already exists to avoid duplicates
-    if (table.parentElement.nextElementSibling?.classList.contains('pagination-container')) {
-        return;
+        this.allRows = Array.from(this.table.querySelectorAll('tbody tr'));
+        this.rowsPerPage = 20;
+        this.currentPage = 1;
+        this.searchTerm = '';
+        this.activeFilters = {};
+
+        this._findContainer();
+        this._bindSearch();
+        this._bindFilters();
+        this._buildPagination();
+        this.render();
     }
 
-    const paginationContainer = document.createElement('div');
-    paginationContainer.className = 'pagination-container mt-4 d-flex flex-column align-items-center gap-2';
-    
-    // Info text
-    const infoText = document.createElement('div');
-    infoText.className = 'text-muted small';
-    infoText.id = `pagination-info-${Math.random().toString(36).substr(2, 9)}`; // Unique ID
-    paginationContainer.appendChild(infoText);
+    // -- DOM discovery -------------------------------------------------------
 
-    const pagination = document.createElement('nav');
-    // Start at page 1
-    pagination.innerHTML = createPaginationHTML(1, totalPages);
-    
-    paginationContainer.appendChild(pagination);
-    table.parentElement.after(paginationContainer); 
-    
-    // Initial update of info text
-    updatePaginationInfo(infoText, 1, rowsPerPage, rows.length);
-    
-    showPage(table, 1, rowsPerPage);
-    
-    pagination.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = e.target.closest('.page-link');
-        if (!target || target.parentElement.classList.contains('disabled')) return;
-        
-        const page = parseInt(target.dataset.page);
-        
-        if (page) {
-            showPage(table, page, rowsPerPage);
-            // Re-render pagination to update active state and sliding window
-            pagination.innerHTML = createPaginationHTML(page, totalPages);
-            updatePaginationInfo(infoText, page, rowsPerPage, rows.length);
+    _findContainer() {
+        this.container = this.element.closest('.tab-pane')
+            || this.element.closest('.card')
+            || this.element.parentElement;
+    }
+
+    _bindSearch() {
+        const input = this.container.querySelector('.table-search');
+        if (!input) return;
+        this.searchInput = input;
+        this._debounceTimer = null;
+
+        input.addEventListener('input', () => {
+            clearTimeout(this._debounceTimer);
+            this._debounceTimer = setTimeout(() => {
+                this.searchTerm = input.value.toLowerCase().trim();
+                this.currentPage = 1;
+                this.render();
+            }, 150);
+        });
+    }
+
+    _bindFilters() {
+        const dropdowns = this.container.querySelectorAll('.filter-dropdown');
+        dropdowns.forEach(dd => {
+            dd.addEventListener('change', () => {
+                this.activeFilters = {};
+                this.container.querySelectorAll('.filter-dropdown').forEach(d => {
+                    if (d.value) this.activeFilters[d.dataset.filter] = d.value;
+                });
+                this.currentPage = 1;
+                this.render();
+            });
+        });
+    }
+
+    // -- Pagination scaffold -------------------------------------------------
+
+    _buildPagination() {
+        this.paginationContainer = document.createElement('div');
+        this.paginationContainer.className =
+            'pagination-container mt-4 d-flex flex-column align-items-center gap-2';
+
+        this.infoText = document.createElement('div');
+        this.infoText.className = 'text-muted small';
+        this.paginationContainer.appendChild(this.infoText);
+
+        this.paginationNav = document.createElement('nav');
+        this.paginationContainer.appendChild(this.paginationNav);
+
+        const insertAfter = this.element.tagName === 'TABLE'
+            ? this.element.parentElement
+            : this.element;
+        insertAfter.after(this.paginationContainer);
+
+        this.paginationNav.addEventListener('click', (e) => {
+            e.preventDefault();
+            const link = e.target.closest('.page-link');
+            if (!link || link.parentElement.classList.contains('disabled')) return;
+            const page = parseInt(link.dataset.page);
+            if (page) {
+                this.currentPage = page;
+                this.render();
+            }
+        });
+    }
+
+    // -- Core render pipeline ------------------------------------------------
+
+    render() {
+        const visible = this._applyFiltersAndSearch();
+        this._paginate(visible);
+        this._updatePaginationUI(visible.length);
+        this._updateResultsBadge(visible.length);
+        this._showEmptyState(visible.length === 0);
+    }
+
+    _applyFiltersAndSearch() {
+        const visible = [];
+        const filterKeys = Object.keys(this.activeFilters);
+        const hasSearch = this.searchTerm.length > 0;
+
+        this.allRows.forEach(row => {
+            let passesFilter = true;
+            for (const key of filterKeys) {
+                if (row.dataset[key] && row.dataset[key] !== this.activeFilters[key]) {
+                    passesFilter = false;
+                    break;
+                }
+            }
+
+            let passesSearch = true;
+            if (hasSearch && passesFilter) {
+                passesSearch = row.textContent.toLowerCase().includes(this.searchTerm);
+            }
+
+            if (passesFilter && passesSearch) {
+                visible.push(row);
+            }
+        });
+
+        return visible;
+    }
+
+    _paginate(visibleRows) {
+        const start = (this.currentPage - 1) * this.rowsPerPage;
+        const end = start + this.rowsPerPage;
+        const visibleSet = new Set(visibleRows.slice(start, end));
+
+        this.allRows.forEach(row => {
+            row.classList.toggle('d-none', !visibleSet.has(row));
+            row.style.display = '';
+        });
+    }
+
+    _updatePaginationUI(totalVisible) {
+        const totalPages = Math.max(1, Math.ceil(totalVisible / this.rowsPerPage));
+        if (this.currentPage > totalPages) this.currentPage = totalPages;
+
+        if (totalPages <= 1) {
+            this.paginationContainer.style.display = 'none';
+            return;
         }
-    });
+
+        this.paginationContainer.style.display = '';
+        this.paginationNav.innerHTML = createPaginationHTML(this.currentPage, totalPages);
+
+        const start = (this.currentPage - 1) * this.rowsPerPage + 1;
+        const end = Math.min(this.currentPage * this.rowsPerPage, totalVisible);
+        this.infoText.textContent = `Showing ${start} to ${end} of ${totalVisible} results`;
+    }
+
+    _updateResultsBadge(totalVisible) {
+        if (!this.searchInput) return;
+        const isFiltering = this.searchTerm.length > 0
+            || Object.keys(this.activeFilters).length > 0;
+
+        let badge = this.searchInput.parentElement.querySelector('.dt-results-badge');
+        if (!isFiltering) {
+            if (badge) badge.remove();
+            return;
+        }
+
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'dt-results-badge badge bg-primary-custom rounded-pill ms-2';
+            badge.style.cssText = 'font-size:.7rem;vertical-align:middle;';
+            this.searchInput.parentElement.appendChild(badge);
+        }
+        badge.textContent = `${totalVisible} found`;
+    }
+
+    _showEmptyState(isEmpty) {
+        let emptyRow = this.table.querySelector('.dt-empty-row');
+        if (!isEmpty) {
+            if (emptyRow) emptyRow.remove();
+            return;
+        }
+
+        if (!emptyRow) {
+            const cols = this.table.querySelectorAll('thead th').length || 1;
+            emptyRow = document.createElement('tr');
+            emptyRow.className = 'dt-empty-row';
+            emptyRow.innerHTML = `<td colspan="${cols}" class="text-center text-muted py-5">
+                <i class="fas fa-search me-2"></i>No results found</td>`;
+            this.table.querySelector('tbody').appendChild(emptyRow);
+        }
+    }
 }
 
-function updatePaginationInfo(element, page, rowsPerPage, totalRows) {
-    if (!element) return;
-    const start = (page - 1) * rowsPerPage + 1;
-    const end = Math.min(page * rowsPerPage, totalRows);
-    element.textContent = `Showing ${start} to ${end} of ${totalRows} entries`;
-}
+// -- Shared pagination HTML builder (unchanged) ------------------------------
 
 function createPaginationHTML(currentPage, totalPages) {
     let html = '<ul class="pagination">';
-    
-    // Previous button
+
     const prevDisabled = currentPage === 1 ? ' disabled' : '';
     const prevPage = Math.max(1, currentPage - 1);
     html += `<li class="page-item${prevDisabled}">
@@ -389,41 +485,31 @@ function createPaginationHTML(currentPage, totalPages) {
                     <span aria-hidden="true">&laquo;</span>
                 </a>
              </li>`;
-    
-    // Smart pagination logic: [1] ... [current-1] [current] [current+1] ... [total]
+
     const range = [];
-    const delta = 2; // Number of pages to show around current page
-    
+    const delta = 2;
     for (let i = 1; i <= totalPages; i++) {
-        if (
-            i === 1 || // Always show first
-            i === totalPages || // Always show last
-            (i >= currentPage - delta && i <= currentPage + delta) // Show around current
-        ) {
+        if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) {
             range.push(i);
         }
     }
-    
+
     let l;
     for (let i of range) {
         if (l) {
             if (i - l === 2) {
-                // If gap is small, fill it
                 range.push(l + 1);
             } else if (i - l !== 1) {
-                // Add ellipsis
                 html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
             }
         }
-        
         const activeClass = i === currentPage ? ' active' : '';
         html += `<li class="page-item${activeClass}">
                     <a class="page-link" href="#" data-page="${i}">${i}</a>
                  </li>`;
         l = i;
     }
-    
-    // Next button
+
     const nextDisabled = currentPage === totalPages ? ' disabled' : '';
     const nextPage = Math.min(totalPages, currentPage + 1);
     html += `<li class="page-item${nextDisabled}">
@@ -431,82 +517,15 @@ function createPaginationHTML(currentPage, totalPages) {
                     <span aria-hidden="true">&raquo;</span>
                 </a>
              </li>`;
-    
+
     html += '</ul>';
     return html;
 }
 
-function showPage(table, page, rowsPerPage) {
-    const rows = table.querySelectorAll('tbody tr');
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    
-    rows.forEach((row, index) => {
-        // Skip rows that are filtered out by search
-        if (row.classList.contains('d-none-filter')) return;
-        
-        if (index >= start && index < end) {
-             row.classList.remove('d-none');
-        } else {
-             row.classList.add('d-none');
-        }
-    });
-}
+// -- Bootstrap wiring --------------------------------------------------------
 
-function initializeFilters() {
-    const filterDropdowns = document.querySelectorAll('.filter-dropdown');
-    
-    filterDropdowns.forEach(dropdown => {
-        dropdown.addEventListener('change', function() {
-            // Find the related table
-            const tabPane = this.closest('.tab-pane');
-            if (tabPane) {
-                const table = tabPane.querySelector('table');
-                if (table) {
-                    applyFilters(table, tabPane);
-                }
-            }
-        });
+function initializeDataTables() {
+    document.querySelectorAll('.data-table').forEach(el => {
+        el._dtController = new DataTableController(el);
     });
-}
-
-function applyFilters(table, container) {
-    const filters = {};
-    container.querySelectorAll('.filter-dropdown').forEach(dropdown => {
-        if (dropdown.value) {
-            filters[dropdown.dataset.filter] = dropdown.value;
-        }
-    });
-    
-    const rows = table.querySelectorAll('tbody tr');
-    rows.forEach(row => {
-        let shouldShow = true;
-        
-        Object.keys(filters).forEach(filterKey => {
-            const cell = row.dataset[filterKey]; // Use dataset directly
-            if (cell && cell !== filters[filterKey]) {
-                shouldShow = false;
-            }
-        });
-        
-        if (shouldShow) {
-            row.classList.remove('d-none-filter');
-            row.style.display = ''; 
-        } else {
-            row.classList.add('d-none-filter');
-            row.style.display = 'none';
-        }
-    });
-    
-    // Hide pagination when filtering is active (simple solution)
-    const pagination = table.parentElement.nextElementSibling;
-    if (pagination && pagination.classList.contains('pagination-container')) {
-        const hasActiveFilter = Object.keys(filters).length > 0;
-        pagination.style.display = hasActiveFilter ? 'none' : '';
-        if (!hasActiveFilter) {
-             // Reset to page 1
-             const firstPageLink = pagination.querySelector('[data-page="1"]');
-             if (firstPageLink) firstPageLink.click();
-        }
-    }
 }

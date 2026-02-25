@@ -14,7 +14,20 @@ class Config:
     BASE_DIR = Path(__file__).parent
     SOURCES_DIR = BASE_DIR / 'sources'
     
-    # Amplitude configuration
+    # Amplitude configuration — API (live) vs CSV (fallback)
+    AMPLITUDE_API_KEY = os.environ.get('AMPLITUDE_API_KEY', '')
+    AMPLITUDE_SECRET_KEY = os.environ.get('AMPLITUDE_SECRET_KEY', '')
+    AMPLITUDE_REGION = os.environ.get('AMPLITUDE_REGION', 'us')
+    AMPLITUDE_SOURCE_MODE = os.environ.get('AMPLITUDE_SOURCE_MODE', 'api')
+    AMPLITUDE_CACHE_TTL = int(os.environ.get('AMPLITUDE_CACHE_TTL', '900'))
+
+    _AMP_URLS = {
+        'us': 'https://amplitude.com/api/2',
+        'eu': 'https://analytics.eu.amplitude.com/api/2',
+    }
+    AMPLITUDE_BASE_URL = _AMP_URLS.get(AMPLITUDE_REGION, _AMP_URLS['us'])
+
+    # Amplitude CSV fallback paths
     AMPLITUDE_DIR = SOURCES_DIR / 'amplitude'
     AMPLITUDE_CSV = AMPLITUDE_DIR / 'amplitude_events.csv'
     

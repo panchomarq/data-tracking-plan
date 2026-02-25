@@ -71,7 +71,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Cards */
 .card {
-    background: #FFFFFF;
+    background: var(white);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
@@ -85,7 +85,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .card-header {
-    background: #FFFFFF;
+    background: var(white);
     border-bottom: 1px solid var(--border-color);
     padding: 1.25rem 1.5rem;
     font-weight: 600;
@@ -162,7 +162,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .table tbody tr:hover {
-    background-color: #F3F4F6;
+    background-color: var(--light-bg);
 }
 
 /* Badges */
@@ -227,3 +227,89 @@ h1, h2, h3, h4, h5, h6 {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
+/* Auto-generated from inline style */
+.inline-fix-56 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-62 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-68 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-249 { max-width: 300px; }
+
+/* Auto-generated from inline style */
+.inline-fix-156 { width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px; }
+
+/* Auto-generated from inline style */
+.inline-fix-10 { font-size: 3rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-136 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-142 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-148 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-51 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-57 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-63 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-69 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-76 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-82 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-88 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-94 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-101 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-107 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-113 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-119 { font-size: 0.7rem; }
+
+/* Auto-generated from inline style */
+.inline-fix-233 { width: 100%; height: 400px; }
+
+/* Auto-generated from inline style */
+.inline-fix-10 { width:32px;height:32px;display:flex;align-items:center;justify-content:center; }
+
+/* Auto-generated from inline style */
+.inline-fix-91 { max-width: 250px; }
+
+/* Auto-generated from inline style */
+.inline-fix-36 { width: 60px; height: 60px; }
+
+/* Auto-generated from inline style */
+.inline-fix-48 { width: 60px; height: 60px; }
+
+/* Auto-generated from inline style */
+.inline-fix-53 {  }
+
+/* Auto-generated from inline style */
+.inline-fix-60 { width: 60px; height: 60px; }
+
+/* Auto-generated from inline style */
+.inline-fix-157 { max-width: 400px; }

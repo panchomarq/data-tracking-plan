@@ -4,6 +4,7 @@ from parsers.insider_parser import InsiderParser
 from parsers.gtm_parser import GTMParser
 from config import Config
 
+
 class ParserManager:
     """
     Singleton service to manage data parsers initialization and access.
@@ -31,13 +32,44 @@ class ParserManager:
     
     def _load_parsers(self):
         """Initialize all parsers with error handling."""
-        self._init_parser('amplitude', AmplitudeParser, Config.AMPLITUDE_CSV)
+        self._init_amplitude()
         self._init_parser('insider', InsiderParser, Config.INSIDER_JSON)
         self._init_parser('gtm_server', GTMParser, Config.GTM_SERVER_JSON)
         self._init_parser('gtm_client', GTMParser, Config.GTM_CLIENT_JSON)
-        
+
+    def _init_amplitude(self):
+        """Initialize the Amplitude parser in API or CSV mode."""
+        mode = Config.AMPLITUDE_SOURCE_MODE
+
+        if mode == 'api' and Config.AMPLITUDE_API_KEY and Config.AMPLITUDE_SECRET_KEY:
+            try:
+                from services.amplitude_client import AmplitudeAPIClient
+
+                client = AmplitudeAPIClient(
+                    api_key=Config.AMPLITUDE_API_KEY,
+                    secret_key=Config.AMPLITUDE_SECRET_KEY,
+                    base_url=Config.AMPLITUDE_BASE_URL,
+                )
+                self.parsers['amplitude'] = AmplitudeParser(
+                    api_client=client,
+                    cache_ttl=Config.AMPLITUDE_CACHE_TTL,
+                )
+                print("✓ Amplitude parser initialized (API mode — live data)")
+                return
+            except Exception as exc:
+                print(f"✗ Amplitude API init failed ({exc}), falling back to CSV")
+
+        try:
+            self.parsers['amplitude'] = AmplitudeParser(
+                file_path=str(Config.AMPLITUDE_CSV)
+            )
+            print("✓ Amplitude parser initialized (CSV mode — local file)")
+        except Exception as exc:
+            print(f"✗ Error initializing Amplitude parser: {exc}")
+            self.parsers['amplitude'] = None
+
     def _init_parser(self, key: str, parser_class: Any, file_path: Any):
-        """Helper to initialize a single parser safely."""
+        """Helper to initialize a single file-based parser safely."""
         try:
             self.parsers[key] = parser_class(str(file_path))
             print(f"✓ {key.replace('_', ' ').title()} parser initialized successfully")
@@ -52,6 +84,7 @@ class ParserManager:
     def get_all_parsers(self) -> Dict[str, Any]:
         """Get all parsers."""
         return self.parsers
+
 
 # Global instance
 parser_manager = ParserManager()

@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template
 from services.parser_manager import parser_manager
+import json
+from pathlib import Path
 
 web_bp = Blueprint('web', __name__)
 
@@ -120,6 +122,20 @@ def gtm_detail(container_type):
     }
     
     return render_template('gtm_detail.html', data=data, container_type=container_type)
+
+@web_bp.route('/audit')
+def ui_audit():
+    """
+    UI/UX Audit page showing code quality issues.
+    """
+    report_path = Path(__file__).parent.parent / 'audit_report.json'
+    report = None
+    
+    if report_path.exists():
+        with open(report_path, 'r') as f:
+            report = json.load(f)
+    
+    return render_template('audit.html', report=report)
 
 @web_bp.app_errorhandler(404)
 def not_found(error):

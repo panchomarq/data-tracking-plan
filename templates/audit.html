@@ -1,0 +1,415 @@
+{% extends "base.html" %}
+
+{% block title %}UI/UX Audit - Data Tracking Plan{% endblock %}
+
+{% block content %}
+<div class="row mb-4 animate-fade-in">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h1 class="display-6 fw-bold text-dark mb-2">
+                    <i class="fas fa-bug me-2 text-danger"></i>UI/UX Audit
+                </h1>
+                <p class="text-muted mb-0">
+                    Scan your frontend for inconsistencies and code quality issues.
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                {% if report and report.design_tokens %}
+                <button id="fixAllTokensBtn" class="btn btn-success btn-lg">
+                    <i class="fas fa-magic me-2"></i>Fix All Colors
+                </button>
+                {% endif %}
+                <button id="runAuditBtn" class="btn btn-primary btn-lg">
+                    <i class="fas fa-play me-2"></i>Run Audit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-4 mb-5 animate-fade-in">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center p-4">
+                <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3 inline-fix-36">
+                    <i class="fas fa-palette fa-xl text-warning"></i>
+                </div>
+                <h2 class="fw-bold mb-1" id="tokenCount">{{ report.design_tokens | length if report else '-' }}</h2>
+                <p class="text-muted mb-0">Design Token Issues</p>
+                <small class="text-muted">Hardcoded colors</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center p-4">
+                <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3 inline-fix-48">
+                    <i class="fas fa-code fa-xl text-danger"></i>
+                </div>
+                <h2 class="fw-bold mb-1" id="styleCount">{{ report.inline_styles | length if report else '-' }}</h2>
+                <p class="text-muted mb-0">Inline Styles</p>
+                <small class="text-muted inline-fix-53"> attributes</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center p-4">
+                <div class="rounded-circle bg-info bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3 inline-fix-60">
+                    <i class="fas fa-universal-access fa-xl text-info"></i>
+                </div>
+                <h2 class="fw-bold mb-1" id="a11yCount">{{ report.accessibility | length if report else '-' }}</h2>
+                <p class="text-muted mb-0">Accessibility Issues</p>
+                <small class="text-muted">Missing alt, empty links</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Indicator -->
+<div id="loadingIndicator" class="text-center py-5 d-none">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Running...</span>
+    </div>
+    <p class="mt-3 text-muted" id="loadingText">Running audit...</p>
+</div>
+
+{% if report %}
+<!-- Design Tokens -->
+<div class="card border-0 shadow-sm mb-4 animate-fade-in">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">
+            <i class="fas fa-palette me-2 text-warning"></i>Design Token Issues
+        </h5>
+        <span class="badge bg-warning" id="tokenBadge">{{ report.design_tokens | length }}</span>
+    </div>
+    <div class="card-body p-0">
+        {% if report.design_tokens %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Line</th>
+                        <th>Issue</th>
+                        <th>Suggestion</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tokenTableBody">
+                    {% for item in report.design_tokens %}
+                    <tr id="token-row-{{ loop.index }}">
+                        <td><code>{{ item.file }}</code></td>
+                        <td><span class="badge bg-secondary">{{ item.line }}</span></td>
+                        <td>{{ item.issue }}</td>
+                        <td><code class="text-success">{{ item.suggestion }}</code></td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-success fix-token-btn"
+                                    data-file="{{ item.file }}"
+                                    data-line="{{ item.line }}"
+                                    data-token="{{ item.token }}"
+                                    data-replacement="{{ item.suggestion | replace('Use ', '') }}"
+                                    data-row="token-row-{{ loop.index }}">
+                                <i class="fas fa-wrench me-1"></i>Fix
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+            <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+            <p class="mb-0">No design token issues found!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Inline Styles -->
+<div class="card border-0 shadow-sm mb-4 animate-fade-in">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">
+            <i class="fas fa-code me-2 text-danger"></i>Inline Styles
+        </h5>
+        <span class="badge bg-danger" id="styleBadge">{{ report.inline_styles | length }}</span>
+    </div>
+    <div class="card-body p-0">
+        {% if report.inline_styles %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Line</th>
+                        <th>Content</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="styleTableBody">
+                    {% for item in report.inline_styles %}
+                    <tr id="style-row-{{ loop.index }}">
+                        <td><code>{{ item.file }}</code></td>
+                        <td><span class="badge bg-secondary">{{ item.line }}</span></td>
+                        <td><code class="text-truncate d-inline-block inline-fix-157" title="{{ item.content }}">{{ item.content }}</code></td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-danger fix-style-btn"
+                                    data-file="{{ item.file }}"
+                                    data-line="{{ item.line }}"
+                                    data-row="style-row-{{ loop.index }}">
+                                <i class="fas fa-wrench me-1"></i>Fix
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+            <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+            <p class="mb-0">No inline styles found!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Accessibility -->
+<div class="card border-0 shadow-sm mb-4 animate-fade-in">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">
+            <i class="fas fa-universal-access me-2 text-info"></i>Accessibility Issues
+        </h5>
+        <span class="badge bg-info">{{ report.accessibility | length }}</span>
+    </div>
+    <div class="card-body p-0">
+        {% if report.accessibility %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Line</th>
+                        <th>Issue</th>
+                    </tr>
+                </thead>
+                <tbody id="a11yTableBody">
+                    {% for item in report.accessibility %}
+                    <tr>
+                        <td><code>{{ item.file }}</code></td>
+                        <td><span class="badge bg-secondary">{{ item.line }}</span></td>
+                        <td>{{ item.issue }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+            <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+            <p class="mb-0">No accessibility issues found!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% else %}
+<!-- No Report Yet -->
+<div class="card border-0 shadow-sm">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No Audit Report Found</h4>
+        <p class="text-muted mb-4">Click the "Run Audit" button to scan your frontend code.</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- Toast for notifications -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="fixToast" class="toast" role="alert">
+        <div class="toast-header">
+            <i class="fas fa-check-circle text-success me-2"></i>
+            <strong class="me-auto">Fix Applied</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toastMessage"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Toast instance
+const toastEl = document.getElementById('fixToast');
+const toast = new bootstrap.Toast(toastEl);
+
+function showToast(message, isError = false) {
+    const icon = toastEl.querySelector('.toast-header i');
+    icon.className = isError 
+        ? 'fas fa-exclamation-circle text-danger me-2' 
+        : 'fas fa-check-circle text-success me-2';
+    document.getElementById('toastMessage').textContent = message;
+    toast.show();
+}
+
+// Run Audit
+document.getElementById('runAuditBtn').addEventListener('click', async function() {
+    const btn = this;
+    const loading = document.getElementById('loadingIndicator');
+    document.getElementById('loadingText').textContent = 'Running audit...';
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Running...';
+    loading.classList.remove('d-none');
+    
+    try {
+        const response = await fetch('/api/audit/run', { method: 'POST' });
+        const data = await response.json();
+        
+        if (data.success) {
+            window.location.reload();
+        } else {
+            showToast('Audit failed: ' + data.error, true);
+        }
+    } catch (error) {
+        showToast('Error running audit: ' + error.message, true);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-play me-2"></i>Run Audit';
+        loading.classList.add('d-none');
+    }
+});
+
+// Fix All Design Tokens
+const fixAllBtn = document.getElementById('fixAllTokensBtn');
+if (fixAllBtn) {
+    fixAllBtn.addEventListener('click', async function() {
+        if (!confirm('This will fix ALL hardcoded colors. Continue?')) return;
+        
+        const btn = this;
+        const loading = document.getElementById('loadingIndicator');
+        document.getElementById('loadingText').textContent = 'Fixing all design tokens...';
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Fixing...';
+        loading.classList.remove('d-none');
+        
+        try {
+            const response = await fetch('/api/audit/fix/all-tokens', { method: 'POST' });
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast(`Fixed ${data.fixed_count} design token issues!`);
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showToast('Fix failed: ' + data.error, true);
+            }
+        } catch (error) {
+            showToast('Error: ' + error.message, true);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-magic me-2"></i>Fix All Colors';
+            loading.classList.add('d-none');
+        }
+    });
+}
+
+// Fix Individual Design Token
+document.querySelectorAll('.fix-token-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const file = this.dataset.file;
+        const line = parseInt(this.dataset.line);
+        const token = this.dataset.token;
+        const replacement = this.dataset.replacement;
+        const rowId = this.dataset.row;
+        
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        try {
+            const response = await fetch('/api/audit/fix/token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ file, line, token, replacement })
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast(data.message);
+                // Mark row as fixed
+                const row = document.getElementById(rowId);
+                row.classList.add('table-success');
+                this.innerHTML = '<i class="fas fa-check"></i> Fixed';
+                this.classList.remove('btn-outline-success');
+                this.classList.add('btn-success');
+                
+                // Update badge count
+                const badge = document.getElementById('tokenBadge');
+                const currentCount = parseInt(badge.textContent);
+                badge.textContent = Math.max(0, currentCount - 1);
+            } else {
+                showToast('Fix failed: ' + data.error, true);
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-wrench me-1"></i>Fix';
+            }
+        } catch (error) {
+            showToast('Error: ' + error.message, true);
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-wrench me-1"></i>Fix';
+        }
+    });
+});
+
+// Fix Individual Inline Style
+document.querySelectorAll('.fix-style-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const file = this.dataset.file;
+        const line = parseInt(this.dataset.line);
+        const rowId = this.dataset.row;
+        
+        // Prompt for class name
+        const className = prompt('Enter a CSS class name for this style:', `inline-fix-${line}`);
+        if (!className) return;
+        
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        try {
+            const response = await fetch('/api/audit/fix/inline-style', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ file, line, class_name: className })
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast(`Moved to .${className} in dashboard.css`);
+                // Mark row as fixed
+                const row = document.getElementById(rowId);
+                row.classList.add('table-success');
+                this.innerHTML = '<i class="fas fa-check"></i> Fixed';
+                this.classList.remove('btn-outline-danger');
+                this.classList.add('btn-danger');
+                
+                // Update badge count
+                const badge = document.getElementById('styleBadge');
+                const currentCount = parseInt(badge.textContent);
+                badge.textContent = Math.max(0, currentCount - 1);
+            } else {
+                showToast('Fix failed: ' + data.error, true);
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-wrench me-1"></i>Fix';
+            }
+        } catch (error) {
+            showToast('Error: ' + error.message, true);
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-wrench me-1"></i>Fix';
+        }
+    });
+});
+</script>
+{% endblock %}

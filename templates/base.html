@@ -55,6 +55,11 @@
                             <i class="fas fa-tags me-1 text-warning-custom"></i> GTM
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 rounded-2 {% if request.endpoint and 'audit' in request.endpoint %}active{% endif %}" href="{{ url_for('web.ui_audit') }}">
+                            <i class="fas fa-bug me-1 text-danger"></i> Audit
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
